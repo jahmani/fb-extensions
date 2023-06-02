@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "store-gallary": {
+      "hosting": {
+        "products-gallery-app": [
+          "store-gallary"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "store-gallary"
+  }
+}

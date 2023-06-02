@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Edit Product</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form [formGroup]="productForm" (ngSubmit)="saveProductToFirestore(productForm.value)">
+
+    <ion-item>
+      <ion-input label="Name" formControlName="name"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Price" type="number" formControlName="price"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Brand" formControlName="brand"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Cost Price" type="number" formControlName="costPrice"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Notice" formControlName="notice"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Model No" formControlName="modelNo"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Size" formControlName="size"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Color" formControlName="color"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label>Images</ion-label>
+      <input type="file" (change)="uploadImage($event)">
+    </ion-item>
+    <div formArrayName="images">
+    <ion-item *ngFor="let imageControl of imagesArray.controls; let i = index">
+      <ion-input style="display: none;" [formControlName]="i"></ion-input> 
+      <ion-img [src]="imageControl.value"></ion-img>
+      <ion-button (click)="removeImage(i)">Remove</ion-button>
+    </ion-item>
+    </div>
+
+  
+    <ion-item>
+      <ion-input label="Tag" formControlName="tag"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Balance" type="number" formControlName="balance"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-input label="Origin" formControlName="origin"></ion-input>
+    </ion-item>
+  
+    <ion-button type="submit">Save</ion-button>
+  </form>
+  
+</ion-content>

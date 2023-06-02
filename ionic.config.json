@@ -1,0 +1,7 @@
+{
+  "name": "@store-app-repository/source",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

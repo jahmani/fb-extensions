@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@store-app-repository/app-models": ["libs/app-models/src/index.ts"],
+      "@store-app-repository/functions": ["libs/functions/src/index.ts"],
+      "fbFunctions": ["libs/fb-functions/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
