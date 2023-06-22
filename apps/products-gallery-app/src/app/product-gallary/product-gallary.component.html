@@ -1,0 +1,25 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Edit Product 3</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <cdk-virtual-scroll-viewport itemSize="auto">
+
+        <div class="gallary_container">
+            <div class="image_container" *cdkVirtualFor="let  prod of products$|async; let i=index">
+              <img style="object-fit: cover;" [ngSrc]="getthumbUrl(prod!.imageIds![0])" alt="{{prod.name}}" loading="lazy" fill />
+            </div>
+            
+          </div>
+<!--           
+
+    <ion-row   *ngIf="products$| async as products">
+        <ion-col size="auto"  *cdkVirtualFor="let  prod of products; let i=index" class="photo-grid-item">
+          <img  class="grid-img" [src]="getthumbUrl(prod!.imageIds![0])" alt="" />
+        </ion-col>
+</ion-row> -->
+
+
+    </cdk-virtual-scroll-viewport>
+  </ion-content>

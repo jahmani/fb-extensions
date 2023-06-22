@@ -1,4 +1,7 @@
 {
+  "projects": {
+    "default": "store-gallary"
+  },
   "targets": {
     "store-gallary": {
       "hosting": {
@@ -8,7 +11,11 @@
       }
     }
   },
-  "projects": {
-    "default": "store-gallary"
+  "etags": {
+    "store-gallary": {
+      "extensionInstances": {
+        "storage-resize-images": "89582d572e6d7e048e7b8e02e19d8acd49d830a23222230892e2411ba23e4ebb"
+      }
+    }
   }
 }

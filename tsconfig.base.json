@@ -16,6 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@store-app-repository/app-models": ["libs/app-models/src/index.ts"],
+      "@store-app-repository/firestor-services": [
+        "libs/firestor-services/src/index.ts"
+      ],
       "@store-app-repository/functions": ["libs/functions/src/index.ts"],
       "fbFunctions": ["libs/fb-functions/src/index.ts"]
     }

@@ -6,7 +6,7 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 const firestore = getFirestore();
 
 export const updateImageReferences = functions.firestore
-    .document('stores/{storeId}/products/{productId}')
+    .document('stores/{storeId}/galleries/default/products/{productId}')
     .onWrite(async (change, context) => {
     const updatedProduct = change.after.exists ? change.after.data() : null;
     const previousProduct = change.before.exists ? change.before.data() : null;
@@ -30,7 +30,7 @@ export const updateImageReferences = functions.firestore
     }
     for (const removedURL of removedImageURLs) {
         const imageId = getImageIdFromURL(removedURL);
-        const imageDocRef = storeRef.collection('Images').doc(imageId);
+        const imageDocRef = storeRef.collection('productPhotos').doc(imageId);
         batch.update(imageDocRef, {
             refCount: FieldValue.increment(-1),
             linkedProducts: FieldValue.arrayRemove(productId),

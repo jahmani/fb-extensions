@@ -1,0 +1,33 @@
+cdk-virtual-scroll-viewport {
+  height: 100%;
+  width: 100%;
+}
+
+.gallary_container {
+  display: grid;
+  gap: 0.1rem;
+  grid-template-columns: repeat(auto-fit, minmax(7em, 1fr));
+  grid-auto-rows: 7em;
+  padding: 5px;
+}
+
+.image_container {
+  position: relative;
+}
+.image_container img {
+  width: 100%;
+  height: 100%;
+//   box-shadow: rgba(3, 8, 20, 0.1) 0px 0.15rem 0.5rem,
+//     rgba(2, 8, 20, 0.1) 0px 0.075rem 0.175rem;
+  object-fit: cover;
+}
+
+@media screen and (min-width: 768px) {
+  .image-tall {
+    grid-row: span 2 / auto;
+  }
+
+  .image-wide {
+    grid-column: span 2 / auto;
+  }
+}

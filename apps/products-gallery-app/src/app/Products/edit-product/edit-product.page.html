@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Edit Product</ion-title>
+    <ion-title>Edit Product 3</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -40,17 +40,26 @@
   
     <ion-item>
       <ion-label>Images</ion-label>
-      <input type="file" (change)="uploadImage($event)">
+      <input type="file" #fileInput (change)="readImgFile($event)">
+      <img [src]="selectedImageSrc" (load)="imgLoaded($event)">
+
     </ion-item>
     <div formArrayName="images">
-    <ion-item *ngFor="let imageControl of imagesArray.controls; let i = index">
-      <ion-input style="display: none;" [formControlName]="i"></ion-input> 
-      <ion-img [src]="imageControl.value"></ion-img>
-      <ion-button (click)="removeImage(i)">Remove</ion-button>
-    </ion-item>
-    </div>
-
+      <ion-item *ngFor="let imageControl of imagesArray.controls; let i = index">
+        <ion-input style="display: none;" [formControlName]="i"></ion-input> 
+        <ion-img [src]="imageControl.value"></ion-img>
+        <ion-button (click)="removeImage(i)">Remove</ion-button>
+      </ion-item>
+      </div>
   
+      <div formArrayName="imageIds">
+        <ion-item *ngFor="let imageControl of imageIdsArray.controls; let i = index">
+          <ion-input  [formControlName]="i"></ion-input> 
+          <ion-button (click)="removeImageId(i)">Remove</ion-button>
+        </ion-item>
+        </div>
+    
+        
     <ion-item>
       <ion-input label="Tag" formControlName="tag"></ion-input>
     </ion-item>

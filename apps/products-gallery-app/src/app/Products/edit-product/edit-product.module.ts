@@ -9,13 +9,13 @@ import { EditProductPageRoutingModule } from './edit-product-routing.module';
 import { EditProductPageComponent } from './edit-product.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    IonicModule,
-    EditProductPageRoutingModule,
-  ],
-  declarations: [EditProductPageComponent],
-  exports:[EditProductPageComponent]
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        IonicModule,
+        EditProductPageRoutingModule,
+        EditProductPageComponent,
+    ],
+    exports: [EditProductPageComponent]
 })
 export class EditProductPageModule {}

@@ -1,13 +1,13 @@
 "use strict";
 
-const { arrayUnion, increment } = require("firebase/firestore");
+import { arrayRemove, arrayUnion, increment} from "firebase/firestore";
 
 exports.updateImageReferences = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const firestore = admin.firestore();
 exports.updateImageReferences = functions.firestore
-    .document('stores/{storeId}/products/{productId}')
+    .document('stores/{storeId}/galleries/default//products/{productId}')
     .onWrite(async (change, context) => {
     const updatedProduct = change.after.exists ? change.after.data() : null;
     const previousProduct = change.before.exists ? change.before.data() : null;

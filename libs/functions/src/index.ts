@@ -15,6 +15,7 @@ admin.initializeApp();
 
 export {createImageDocument} from "./onImageFileFinalize"
 export {updateImageReferences} from "./onProductWrite"
+export {updateWordSuggestions} from "./updateWordSuggestions"
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});

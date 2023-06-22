@@ -1,6 +1,5 @@
 {
   "hosting": [
-
     {
       "target": "products-gallery-app",
       "public": "dist/apps/products-gallery-app",
@@ -68,5 +67,7 @@
   "remoteconfig": {
     "template": "remoteconfig.template.json"
   },
-  "extensions": {}
+  "extensions": {
+    "storage-resize-images": "firebase/storage-resize-images@0.1.36"
+  }
 }

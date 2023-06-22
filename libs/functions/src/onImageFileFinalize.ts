@@ -4,7 +4,10 @@ import functions = require("firebase-functions");
 import admin = require("firebase-admin");
 const firestore = admin.firestore();
 export const createImageDocument = functions.storage.object().onFinalize(async (object) => {
-    const { name, contentType, size, metadata } = object;
+    const { name, contentType, size, metadata, } = object;
+    if (metadata?.resizedImage){
+      return;
+    }
     const photPath = name!.replace('paroducts', 'productsPhotos');
     console.log("object metadata: ", object)
     const imageDocRef = firestore.doc(photPath || "u");
@@ -12,7 +15,7 @@ export const createImageDocument = functions.storage.object().onFinalize(async (
         downloadUrl: `gs://${object.bucket}/${name}`,
         contentType,
         size,
-        originalFileName : metadata!.originalFileName,
+        metadata,
         refCount: 0,
         linkedProducts: [],
     };
