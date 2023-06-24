@@ -1,8 +1,8 @@
 import { InjectionToken, NgModule, inject } from '@angular/core';
-import { ActivatedRoute, ActivatedRouteSnapshot, PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { map } from 'rxjs';
+import { ActivatedRoute, PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 export const storeIdToken = new InjectionToken<string>('store id');
+export const productGalleryIdToken = new InjectionToken<string>('productGalleryIdToken');
 
 const routes: Routes = [
   {

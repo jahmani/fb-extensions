@@ -1,6 +1,6 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, inject } from '@angular/core';
 import { AppComponent } from './app/app.component';
 import { connectStorageEmulator } from 'firebase/storage';
 import { provideStorage, getStorage } from '@angular/fire/storage';
@@ -23,11 +23,18 @@ import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { IonicRouteStrategy, IonicModule } from '@ionic/angular';
 import { RouteReuseStrategy } from '@angular/router';
+import { environmentToken } from '@store-app-repository/firestor-services';
 
-const useEmulators = true && !environment.production && environment.useEmulators;
+// const useEmulators = false && !environment.production && environment.useEmulators;
 
 bootstrapApplication(AppComponent, {
   providers: [
+    {
+      provide:environmentToken,
+      useValue:{
+        useEmulators : environment.useEmulators,
+      }
+    },
     importProvidersFrom(
       BrowserModule,
       IonicModule.forRoot(),
@@ -35,29 +42,29 @@ bootstrapApplication(AppComponent, {
       provideFirebaseApp(() => initializeApp(environment.firebase)),
       provideAuth(() => {
         const auth = getAuth();
-        if (useEmulators) {
+        if (inject(environmentToken).useEmulator) {
           connectAuthEmulator(auth, 'http://localhost:9099');
         }
         return auth;
       }),
-      provideFirestore(() => {
-        const firestore = getFirestore();
-        // enableIndexedDbPersistence(firestore);
-        if (useEmulators) {
-          connectFirestoreEmulator(firestore, 'localhost', 8080);
-        }
-        return firestore;
-      }),
+      // provideFirestore(() => {
+      //   const firestore = getFirestore();
+      //   // enableIndexedDbPersistence(firestore);
+      //   if (inject(environmentToken).useEmulator) {
+      //     connectFirestoreEmulator(firestore, 'localhost', 8080);
+      //   }
+      //   return firestore;
+      // }),
       provideFunctions(() => {
         const functions = getFunctions();
-        if (useEmulators) {
+        if (inject(environmentToken).useEmulator) {
           connectFunctionsEmulator(functions, 'localhost', 5001);
         }
         return functions;
       }),
       provideStorage(() => {
         const stoarge = getStorage();
-        if (useEmulators) {
+        if (inject(environmentToken).useEmulator) {
 
         connectStorageEmulator(stoarge, 'localhost', 9199);
         }

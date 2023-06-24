@@ -14,17 +14,19 @@ export class LasyFirestoreProviderService {
 
   readonly firestore$ :  Observable<Firestore>
   private _firestoreInstance: Firestore | null = null;
+  
   get firestoreInstance(){
     return this._firestoreInstance;
   }
   // firestorePromise: Promise<Firestore>;
   // loader: any;
   constructor() { 
+    const useEmulator = inject(environmentToken, {optional: true})?.useEmulator;
     this.firestore$ = from(import('./rexportGetFirestore')).pipe(
       tap(()=>console.log('./rexportGetFirestore get imported oncecccccccccccccccccccccccccccccccc', )),
       map(({getFirestore})=>{
         const firestore = getFirestore()
-        if (inject(environmentToken).useEmulator) {
+        if (useEmulator) {
             connectFirestoreEmulator(firestore,'localhost',8080)
           }
           return firestore;

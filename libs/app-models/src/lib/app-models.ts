@@ -15,6 +15,12 @@ export type FirebaseIdString = string;
 export interface WithId extends Extendable {
   id: FirebaseIdString;
 }
+export interface StoreDoc{
+  storeId: FirebaseIdString;
+}
+export interface ProductGalleryDoc extends StoreDoc{
+  productGalleryId: FirebaseIdString;
+}
 export interface Extendable extends DocumentData {
   ext?: Extension;
 }
@@ -37,7 +43,7 @@ export interface ProductVariant {
   note: string;
 }
 
-export interface Product extends Editable, Extendable {
+export interface Product extends Editable, Extendable, ProductGalleryDoc {
   name: string;
   price: number;
   brand: string;
@@ -72,12 +78,13 @@ export interface Store extends Editable {
   productGalleries: ProductGallery[];
   productPhotos: ProductPhoto[];
 }
-export interface ProductGallery extends Editable {
+export interface ProductGallery extends Editable, StoreDoc {
   name: string;
+  storeId: FirebaseIdString;
   products: Product[];
 }
 
-export interface ProductPhoto extends Editable {
+export interface ProductPhoto extends Editable, StoreDoc {
   contentType: string;
   downloadUrl: string;
   metadata: {

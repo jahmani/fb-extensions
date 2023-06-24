@@ -6,6 +6,7 @@ import { Product } from '@store-app-repository/app-models';
 import { Observable, map } from 'rxjs';
 import { IonicModule } from '@ionic/angular';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ProductsDataService } from '../dataServices/products-data.service';
 
 
 @Component({
@@ -16,13 +17,15 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
   styleUrls: ['./product-gallary.component.scss'],
 })
 export class ProductGallaryComponent {
-  private firestore: Firestore = inject(Firestore)
+  // private firestore: Firestore = inject(Firestore)
   storeId = inject(storeIdToken);
+  private productsService = inject(ProductsDataService);
   products$: Observable<Product[]>;
   ;
   constructor(){
-    const productsCollection = collection(this.firestore,`stores/${this.storeId}/galleries/default/products` );
-    this.products$ = collectionData(productsCollection) as Observable<Product[]>
+    // const productsCollection = collection(this.firestore,`stores/${this.storeId}/galleries/default/products` );
+    // this.products$ = collectionData(productsCollection) as Observable<Product[]>;
+    this.products$ = this.productsService.getAllDocs$();
 
   }
 

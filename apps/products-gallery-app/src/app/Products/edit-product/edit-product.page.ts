@@ -7,6 +7,7 @@ import { collection, setDoc } from 'firebase/firestore';
 import { NgFor } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { storeIdToken } from '../../app-routing.module';
+import { ProductsDataService } from '../../dataServices/products-data.service';
 
 @Component({
     selector: 'store-app-repository-edit-product-page',
@@ -23,6 +24,8 @@ export class EditProductPageComponent {
   @Output() saveProduct: EventEmitter<Product> = new EventEmitter<Product>();
   injectedStoreId = inject(storeIdToken);
   storeId = this.injectedStoreId; // "tHP7s3ysRD4IU45Z0j8N"
+  private productsService = inject(ProductsDataService);
+
 
   productForm: FormGroup;
   imagesArray: FormArray;
@@ -34,7 +37,7 @@ export class EditProductPageComponent {
   constructor(
     private formBuilder: FormBuilder = inject(FormBuilder),
     private storage: Storage = inject(Storage),
-    private firestore: Firestore = inject(Firestore)
+    // private firestore: Firestore = inject(Firestore)
   ) {
     this.productForm = this.formBuilder.group({
       name: ['', Validators.required],
@@ -99,12 +102,13 @@ export class EditProductPageComponent {
   
       reader.readAsDataURL(file);
     }
-  uploadImage() {
+  async uploadImage() {
 
     const file = this.selectedFile as File;
     const fileExt = file.name.split('.').pop()
-    const productPhotosCollection = collection(this.firestore, `stores/${this.storeId}/productPhotos`)
-    const newImageId = doc(productPhotosCollection).id;
+    // const productPhotosCollection = collection(this.firestore, `stores/${this.storeId}/productPhotos`)
+    // const newImageId = doc(productPhotosCollection).id;
+    const newImageId = await this.productsService.getNewDocId();
     const filePath = `stores/${this.storeId}/productPhotos/${newImageId}${fileExt && "."+fileExt}`;
     const fileRef = ref(this.storage, filePath);
     const task = uploadBytesResumable(fileRef, file, {customMetadata:{originalFileName: file.name, width:this.imgProperties?.width + '', height: this.imgProperties?.height+'' }});
@@ -125,11 +129,12 @@ export class EditProductPageComponent {
   }
 
   saveProductToFirestore(product: Product) {
-    const productsCollection = collection(this.firestore,`stores/${this.storeId}/galleries/default/products` )
-    const productDocRef = doc(productsCollection);
+    // const productsCollection = collection(this.firestore,`stores/${this.storeId}/galleries/default/products` )
+    // const productDocRef = doc(productsCollection);
     // const productPath = doc(productsCollection).path;
 
-    setDoc(productDocRef,product)
+    this.productsService.create(product)
+    // setDoc(productDocRef,product)
       .then(() => {
         console.log('Product saved successfully.');
      //   this.productForm.reset();
