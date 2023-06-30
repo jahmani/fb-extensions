@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import {  inject } from '@angular/core';
 import { WithId } from '@store-app-repository/app-models';
 import {
   LasyFirestoreProviderService,
@@ -106,9 +106,12 @@ export abstract class WithIdFirestoreService<T extends WithId> {
   getAllDocs$(){
     return this.getDocs$();
   }
-  getQueryedDocs$(    queryConstraints: QueryConstraint[],
+  getQueryedDocs$(    queryConstraints?: QueryConstraint[],
     docLimit?: number){
-      this.currentQueryConstraints = queryConstraints;
+      if (queryConstraints) {
+        this.currentQueryConstraints = queryConstraints;
+
+      }
       return this.getDocs$(queryConstraints,undefined, docLimit)
   }
   getMoreDocs$( docLimit?: number){

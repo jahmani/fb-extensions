@@ -4,14 +4,20 @@
     </ion-toolbar>
   </ion-header>
   <ion-content>
+    <store-app-repository-tags-input #productNameWordsInput type="array" [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
+    <store-app-repository-tags-input #productTagsInput [showInputCtrl]=false   type="array" label="filter by tags" [suggestions]="(productTags$|async) || []"></store-app-repository-tags-input>
     <cdk-virtual-scroll-viewport itemSize="auto">
 
-        <div class="gallary_container">
-            <div class="image_container" *cdkVirtualFor="let  prod of products$|async; let i=index">
+        <div class="gallary_container" *ngIf=" products$|async as products ; else noProducts">
+            <div class="image_container"  [routerLink]="['../edit-product', prod.id]" *ngFor="let  prod of products; let i=index">
               <img style="object-fit: cover;" [ngSrc]="getthumbUrl(prod!.imageIds![0])" alt="{{prod.name}}" loading="lazy" fill />
             </div>
             
           </div>
+          <ng-template #noProducts>
+            noProducts
+          </ng-template>
+          
 <!--           
 
     <ion-row   *ngIf="products$| async as products">

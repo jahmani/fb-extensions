@@ -1,1 +1,2 @@
-export {getFirestore} from "@angular/fire/firestore"
+export {initializeFirestore,   connectFirestoreEmulator,
+    persistentLocalCache,} from "@angular/fire/firestore"

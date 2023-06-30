@@ -1,0 +1,16 @@
+  <div tabindex="0" #wraper (focus)="setFocused()" (blur)="isFocused = false">
+    <div (touchstart)="onMouseDown($event, wraper)">
+
+      <ion-chip (click)="tagSelected.emit(t); " *ngFor="let t of selectedTags; let index" color="tertiary" mode="ios"
+        outline="true">
+        <ion-label>{{ t }}</ion-label>
+
+        <ion-icon name="close-circle"></ion-icon>
+      </ion-chip>
+
+      <ion-chip [ngClass]="{unSelectedChips: !isFocused}" (click)="tagSelected.emit(t); "
+        *ngFor="let t of tags; let index" color="tertiary" mode="ios" outline="true">
+        <ion-label>{{ t }}</ion-label>
+      </ion-chip>
+    </div>
+  </div>

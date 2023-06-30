@@ -1,0 +1,69 @@
+:host {
+  border-bottom: 1px solid #e5e5e5;
+  transition: border-bottom-color 0.15s ease;
+  padding: 5px;
+  display: block;
+}
+
+$default-color: #4a8bfc;
+
+.iti-tag-color {
+  background-color: $default-color;
+  color: white;
+}
+
+.active {
+  border-bottom-color: $default-color;
+}
+.scroll-horizontal {
+  overflow-x: scroll !important;
+}
+
+.iti-tag {
+  display: block;
+  float: left;
+  font-family: sans-serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 4px 10px;
+  max-height: 30px;
+  border-radius: 0;
+
+  .iti-tag-ios {
+    border-radius: 13px;
+  }
+
+  .iti-tag-md {
+    border-radius: 4px;
+  }
+}
+
+.iti-input {
+  background: transparent;
+  border: 0;
+  color: #777;
+  font-family: sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  outline: none;
+  padding: 5px;
+  width: 80px;
+}
+
+a.iti-tag-rm::before {
+  content: ' x';
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+}
+
+.tit-border-color.readonly,
+.active.tit-border-color.readonly {
+  border: none;
+}
+.vertical-align-content {
+  display: flex;
+  align-items: center;
+}

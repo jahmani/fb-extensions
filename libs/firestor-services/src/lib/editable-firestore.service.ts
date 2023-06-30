@@ -24,30 +24,35 @@ export class EditableFirestoreService<
     }
   }
 
-  private editableWithIdConverter: FirestoreDataConverter<T> = {
-    toFirestore(post: PartialWithFieldValue<T>): DocumentData {
-      return post;
-    },
-    fromFirestore(
-      snapshot: QueryDocumentSnapshot,
-      options: SnapshotOptions
-    ): T {
-      const data = snapshot?.data(options);
-      const res = {
-        ...data,
-        id: snapshot.id,
-        ext: { meta: snapshot.metadata },
-      };
-      return res as unknown as T;
-    },
-  };
+  toFirestore(post: PartialWithFieldValue<T>): DocumentData {
+    return post;
+  }
+  fromFirestore(
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions
+  ): T {
+    const data = snapshot?.data(options);
+    const res = {
+      ...data,
+      id: snapshot.id,
+      ext: { meta: snapshot.metadata },
+    };
+    return res as unknown as T;
+  }
 
-  override fbConvertor = this.editableWithIdConverter;
+  // private editableWithIdConverter: FirestoreDataConverter<T> = {
+  //   toFirestore : this.toFirestore,
+  //   fromFirestore: this.fromFirestore
+
+  // };
+
+  override fbConvertor = {toFirestore: this.toFirestore, fromFirestore: this.fromFirestore};
 
   public auth: Auth;
   constructor() {
     super();
     this.auth = inject(Auth);
+    // this.fbConvertor = {toFirestore: this.toFirestore, fromFirestore: this.fromFirestore};
   }
 
   override async create(value: T, id?: string) {

@@ -1,9 +1,25 @@
-import type {  Timestamp, DocumentData  } from '@angular/fire/firestore';
+import type { Timestamp, DocumentData } from '@angular/fire/firestore';
 import type { UserInfo } from '@angular/fire/auth';
-
 
 export function appModels(): string {
   return 'app-models';
+}
+
+export type PickerId =
+  | 'brands'
+  | 'colors'
+  | 'origins'
+  | 'sizes'
+  | 'units'
+  | 'tags';
+export interface PickerOptions extends Editable {
+  id: PickerId;
+  options: PickerOption[];
+}
+export interface PickerOption {
+  label: string;
+  value?: string;
+  url?: string;
 }
 
 export interface Editable extends WithId {
@@ -15,20 +31,25 @@ export type FirebaseIdString = string;
 export interface WithId extends Extendable {
   id: FirebaseIdString;
 }
-export interface StoreDoc{
+export interface StoreDoc {
   storeId: FirebaseIdString;
 }
-export interface ProductGalleryDoc extends StoreDoc{
+export interface ProductGalleryDoc extends StoreDoc {
   productGalleryId: FirebaseIdString;
 }
 export interface Extendable extends DocumentData {
   ext?: Extension;
 }
 export interface Extension {
-  [prop: string]: unknown
+  [prop: string]: unknown;
 }
-export interface imageMeta {width: number, height:number}
-export interface productImagesMeta {[imageId: FirebaseIdString]: imageMeta}
+export interface imageMeta {
+  width: number;
+  height: number;
+}
+export interface productImagesMeta {
+  [imageId: FirebaseIdString]: imageMeta;
+}
 
 export interface ProductVariant {
   subName: string;
@@ -43,8 +64,27 @@ export interface ProductVariant {
   note: string;
 }
 
+export interface GallaryHelperDoc extends Editable, Extendable, ProductGalleryDoc {
+  id: FirebaseIdString;
+}
+
+export interface ProductTag{
+  frequency: number; tagWord: string
+}
+export interface ProductTagDoc extends GallaryHelperDoc {
+  tags: {[tagWord:string]: ProductTag};
+  id: 'ProductTag';
+}
+export interface WordSuggestion extends Editable, Extendable, ProductGalleryDoc {
+  suggestions: { frequency: number; suggestion: string }[];
+  word: string;
+}
+export interface ProductDocTags{
+  [tagWord: string]: boolean
+}
 export interface Product extends Editable, Extendable, ProductGalleryDoc {
   name: string;
+  namePrefexes: string[];
   price: number;
   brand: string;
   costPrice: number;
@@ -57,9 +97,8 @@ export interface Product extends Editable, Extendable, ProductGalleryDoc {
   tags: string[];
   balance: number;
   origin: string;
-  variants: {[id:FirebaseIdString]: ProductVariant};
+  variants: { [id: FirebaseIdString]: ProductVariant };
 }
-
 
 export interface User extends WithId {
   uid: FirebaseIdString;
@@ -94,7 +133,7 @@ export interface ProductPhoto extends Editable, StoreDoc {
     width: number;
     size: number;
     originalFileName: string;
-  }
+  };
   refCount: number;
   linkedProducts: FirebaseIdString[];
 }

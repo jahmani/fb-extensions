@@ -1,4 +1,3 @@
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { importProvidersFrom, inject } from '@angular/core';
 import { AppComponent } from './app/app.component';
@@ -9,21 +8,21 @@ import {
   getFunctions,
   connectFunctionsEmulator,
 } from '@angular/fire/functions';
-import {
-  provideFirestore,
-  getFirestore,
-  connectFirestoreEmulator,
-  enableIndexedDbPersistence,
-} from '@angular/fire/firestore';
+// import {
+//   provideFirestore,
+//   getFirestore,
+//   connectFirestoreEmulator,
+//   enableIndexedDbPersistence,
+// } from '@angular/fire/firestore';
 import { connectAuthEmulator } from 'firebase/auth';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from './environments/environment';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { IonicRouteStrategy, IonicModule } from '@ionic/angular';
-import { RouteReuseStrategy } from '@angular/router';
+import { RouteReuseStrategy, provideRouter, withComponentInputBinding } from '@angular/router';
 import { environmentToken } from '@store-app-repository/firestor-services';
+import { appRoutes } from './app/app.routes';
 
 // const useEmulators = false && !environment.production && environment.useEmulators;
 
@@ -32,13 +31,15 @@ bootstrapApplication(AppComponent, {
     {
       provide:environmentToken,
       useValue:{
-        useEmulators : environment.useEmulators,
+        useEmulator : environment.useEmulators,
       }
     },
+    provideRouter(appRoutes,  withComponentInputBinding()),
+
     importProvidersFrom(
       BrowserModule,
       IonicModule.forRoot(),
-      AppRoutingModule,
+      // AppRoutingModule,
       provideFirebaseApp(() => initializeApp(environment.firebase)),
       provideAuth(() => {
         const auth = getAuth();
@@ -71,6 +72,6 @@ bootstrapApplication(AppComponent, {
         return stoarge;
       })
     ),
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    // { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
 }).catch((err) => console.error(err));
