@@ -19,7 +19,7 @@
     "@capacitor/haptics": "5.0.2",
     "@capacitor/keyboard": "5.0.2",
     "@capacitor/status-bar": "5.0.2",
-    "@ionic/angular": "^7.0.0",
+    "@ionic/angular": "7.1.1-dev.11687550213.1ae44c4e",
     "@nx/angular": "16.2.2",
     "@simondotm/nx-firebase": "^1.1.0-beta.0",
     "axios": "^1.0.0",
@@ -80,3 +80,4 @@
     "typescript": "~5.0.2"
   }
 }
+

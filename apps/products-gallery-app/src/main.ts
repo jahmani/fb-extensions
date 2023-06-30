@@ -28,6 +28,7 @@ import { appRoutes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
   providers: [
+
     {
       provide:environmentToken,
       useValue:{
@@ -38,7 +39,8 @@ bootstrapApplication(AppComponent, {
 
     importProvidersFrom(
       BrowserModule,
-      IonicModule.forRoot(),
+      IonicModule.forRoot({bindToComponentInputs: true} ),
+      
       // AppRoutingModule,
       provideFirebaseApp(() => initializeApp(environment.firebase)),
       provideAuth(() => {

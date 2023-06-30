@@ -70,7 +70,7 @@ export class EditableFirestoreService<
     // return super.create(Object.assign({}, value, editable), id);
   }
 
-  override async update(value: T) {
+  override async update(value: T ) {
     return appEditableDocUpdate(this.collectionRef, this.auth, value);
     // const id = value.id;
     // const user = await this.auth.currentUser;

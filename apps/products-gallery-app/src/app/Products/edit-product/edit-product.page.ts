@@ -22,7 +22,7 @@ import {
   getDownloadURL,
 } from '@angular/fire/storage';
 import { Product, imageMeta } from '@store-app-repository/app-models';
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe, Location, NgFor, NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { ProductsDataService } from '../../dataServices/products-data.service';
 import { WordSuggestionsDataService } from '../../dataServices/word-suggestions-data.service';
@@ -42,6 +42,7 @@ import { storeIdToken } from '../../app.routes';
     NgFor,
     TagsInputComponent,
     AsyncPipe,
+    NgIf
   ],
 })
 export class EditProductPageComponent implements AfterViewInit {
@@ -50,6 +51,7 @@ export class EditProductPageComponent implements AfterViewInit {
     | undefined;
   suggestions: Observable<string[]> | undefined;
   selectedWord$: Observable<string> | undefined;
+  addNew =true;
 
   // private _productId: string;
   @Input() set productId(value: string){
@@ -58,10 +60,20 @@ export class EditProductPageComponent implements AfterViewInit {
   }
 
   async intializeForm(productID: string){
-    const product = await  firstValueFrom(this.productsService.doc$(productID))
-    if (product) {
-      this.productForm.patchValue(product);
+    if (productID === 'new') {
+      this.addNew = true
+    } else{
+      this.addNew = false;
+      const product = await  firstValueFrom(this.productsService.doc$(productID))
+      if (product) {
+        this.productForm.patchValue(product);
+        const productNameWords = product.name.split(' ');
+        this.tagsInputComponent?.setValue(productNameWords);
+      } else{
+        console.log('product not fount');
+      }
     }
+
 
   }
   
@@ -71,6 +83,7 @@ export class EditProductPageComponent implements AfterViewInit {
   storeId = this.injectedStoreId; // "tHP7s3ysRD4IU45Z0j8N"
   private productsService = inject(ProductsDataService);
   private gallaryHelperDocsDataService = inject(GallaryHelperDocsDataService);
+  private location = inject(Location)
   suggestionsService = inject(WordSuggestionsDataService);
 
   productForm: FormGroup;
@@ -87,7 +100,9 @@ export class EditProductPageComponent implements AfterViewInit {
   ) // private firestore: Firestore = inject(Firestore)
   {
     this.productForm = this.formBuilder.group({
+      
       name: ['', Validators.required],
+      id: ['', Validators.required],
       price: ['', Validators.required],
       brand: [''],
       costPrice: [''],
@@ -246,16 +261,21 @@ export class EditProductPageComponent implements AfterViewInit {
 
     product.namePrefexes = namePrefexes;    
 
-    this.productsService
-      .create(product)
+    const prom =this.addNew ? this.productsService.create(product) : this.productsService.update(product);
       // setDoc(productDocRef,product)
-      .then(() => {
+     return prom.then(() => {
         console.log('Product saved successfully.');
+        this.location.back();
         //   this.productForm.reset();
         //   this.imagesArray.clear();
       })
       .catch((error) => {
         console.error('Error saving product:', error);
       });
+  }
+  deleteProduct(productId: string){
+    return this.productsService.delete(productId).then(()=>{
+      this.location.back();
+    })
   }
 }

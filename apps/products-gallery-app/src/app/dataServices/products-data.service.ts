@@ -1,5 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { Product, tagsArrayToTagsObj, tagsObjectToTagsArray } from '@store-app-repository/app-models';
+import {
+  Product,
+  tagsArrayToTagsObj,
+  tagsObjectToTagsArray,
+} from '@store-app-repository/app-models';
 import { EditableFirestoreService } from '@store-app-repository/firestor-services';
 import {
   DocumentData,
@@ -18,7 +22,8 @@ export class ProductsDataService extends EditableFirestoreService<Product> {
     inject(productGalleryIdToken, { optional: true }) || 'default';
   override _basePath = `stores/${this.storeId}/galleries/${this.photoGalaryId}/products`;
 
-  override toFirestore(product: PartialWithFieldValue<Product>): DocumentData {
+  toFirestore2(product: PartialWithFieldValue<Product>): DocumentData {
+    console.log('product: ', product);
     const res = super.toFirestore(product);
     const tagsArray = (product as Product).tags;
     const tagsObj = tagsArrayToTagsObj(tagsArray);
@@ -41,13 +46,16 @@ export class ProductsDataService extends EditableFirestoreService<Product> {
   }
 
   override fbConvertor = {
-    toFirestore: this.toFirestore,
+    toFirestore: this.toFirestore2,
     fromFirestore: this.fromFirestore,
   };
 
+  override update(value: Product): Promise<void> {
+      const res = this.toFirestore2(value) as Product;
+      return super.update(res);
+  }
   constructor() {
     super();
+    console.log('ProductsDataService');
   }
 }
-
-

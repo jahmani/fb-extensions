@@ -1,6 +1,12 @@
 <ion-header>
     <ion-toolbar>
-      <ion-title>Edit Product 3</ion-title>
+      <ion-title>Products Gallary</ion-title>
+      <ion-buttons slot="start">
+        <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active" >
+          <ion-icon slot="start" name="create"></ion-icon>
+          new Product
+        </ion-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
   <ion-content>

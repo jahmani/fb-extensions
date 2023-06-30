@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Edit Product 3</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -76,8 +79,9 @@
     <ion-item>
       <ion-input label="Origin" formControlName="origin"></ion-input>
     </ion-item>
-
     <ion-button type="submit">Save</ion-button>
+    <ion-button *ngIf="!addNew" (click)="deleteProduct(productForm.value.id)" type="submit">delete</ion-button>
+
   </form>
 
 </ion-content>
