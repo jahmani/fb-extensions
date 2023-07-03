@@ -1,6 +1,8 @@
 import type { Timestamp, DocumentData } from '@angular/fire/firestore';
 import type { UserInfo } from '@angular/fire/auth';
-
+import { EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
+import type {UploadTaskSnapshot, UploadTask, StorageReference} from '@angular/fire/storage'
 export function appModels(): string {
   return 'app-models';
 }
@@ -136,4 +138,37 @@ export interface ProductPhoto extends Editable, StoreDoc {
   };
   refCount: number;
   linkedProducts: FirebaseIdString[];
+}
+export interface FileInfo{
+  name: string;
+  type: string;
+  size: number;
+  data?: string;
+  ext: string;
+  file: File;
+  croppeDataBlob?: Blob;
+  croppedData?: string;
+  uploadTaskData?: UploadTaskComponentData;
+  cropperData? :{
+    position: CropperPosition;
+    cropperTransformData? :  ImageTransform;
+
+  }
+}
+
+export interface UploadTaskComponentData{
+  dataUri: string;
+  fileData: string | ArrayBuffer;
+  imgLoaded : boolean;
+  lImgInfo: FileInfo;
+  safeDataUrl: string;
+
+  downloadUrlChange : EventEmitter<string>;
+  cancel : EventEmitter<boolean>;
+  task: UploadTask;
+
+  percentage: Observable<number>;
+  snapshot: Observable<{ ref: StorageReference;
+    snap: UploadTaskSnapshot; }>;
+  downloadURL: string;
 }
