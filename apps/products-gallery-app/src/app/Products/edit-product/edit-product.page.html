@@ -49,19 +49,20 @@
       <ion-input label="Color" formControlName="color"></ion-input>
     </ion-item>
 
-    <ion-item>
+    <!-- <ion-item>
       <ion-label>Images</ion-label>
       <input type="file" #fileInput (change)="readImgFile($event)">
       <img [src]="selectedImageSrc" (load)="imgLoaded($event)">
-
-    </ion-item>
+     </ion-item> -->
+     <store-app-repository-form-photo-control  formControlName="images"></store-app-repository-form-photo-control>
+<!-- 
     <div formArrayName="images">
       <ion-item *ngFor="let imageControl of imagesArray.controls; let i = index">
         <ion-input style="display: none;" [formControlName]="i"></ion-input>
         <ion-img [src]="imageControl.value"></ion-img>
         <ion-button (click)="removeImage(i)">Remove</ion-button>
       </ion-item>
-    </div>
+    </div> -->
 
     <div formArrayName="imageIds">
       <ion-item *ngFor="let imageControl of imageIdsArray.controls; let i = index">

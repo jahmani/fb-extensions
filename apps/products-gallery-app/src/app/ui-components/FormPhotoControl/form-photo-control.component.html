@@ -1,0 +1,212 @@
+<!-- <ion-fab-button style="position: relative;" class="small-margin sequare-fab" (click)="openNativeFileInput()">
+  <ion-icon name="camera-outline"></ion-icon>
+</ion-fab-button> -->
+<!-- <div class="container"  *ngIf="(formimages && formimages.length) || (newUrls && newUrls.length) || (files && files.length)"> -->
+
+    <ion-item *ngIf="showBussyAlert && isBussy()" lines="none">
+        <ion-text color="danger" class="form-error">
+          Please wait to upload images. or remove un wanted images.
+        </ion-text>
+      </ion-item>
+  
+    <div class="container" >
+  
+      <ion-row>
+        <ion-col *ngIf='!(files && files.length>0)'>
+          <div class="big-thumb" (click)="openNativeFileInput()">
+      
+            <ion-thumbnail class="big-thumb">
+              <ion-icon class="full-size" name="camera-outline"></ion-icon>
+              <!-- <img src="../../../../assets/add-image.svg"> -->
+            </ion-thumbnail>
+          </div>
+        </ion-col>
+      
+        <ion-col *ngIf='files && files.length>0'>
+          <div  [class.box-shadow-3d]="files.length > 1" class="big-thumb">
+      
+            <ion-fab vertical="top" horizontal="start" edge slot="fixed" *ngIf="!files[0].uploadTaskData?.snapshot">
+              <ion-fab-button size="small"  (click)="onUploadCancel(files[0], files)">
+                <ion-icon name="close"></ion-icon>
+              </ion-fab-button>
+            </ion-fab>
+          <store-app-repository-upload-task [folderPath]='folderPath' [imgInfo]="files[0]" (click)="openPhotoModal(files)"
+            (downloadComplete)="onDownloadUrlChange($event, files[0], files)" (cancel)="onUploadCancel(files[0], files)">
+          </store-app-repository-upload-task>
+          </div>
+        </ion-col>
+      
+        <ion-col *ngIf="sharedFilesInfo && sharedFilesInfo.length > 0">
+          <div [class.box-shadow-3d]="sharedFilesInfo.length > 1"  class="big-thumb">
+      
+            <ion-fab vertical="top" horizontal="start" edge slot="fixed" *ngIf="!sharedFilesInfo[0].uploadTaskData?.snapshot">
+              <ion-fab-button size="small"  (click)="onUploadCancel(sharedFilesInfo[0], sharedFilesInfo)">
+                <ion-icon name="close"></ion-icon>
+              </ion-fab-button>
+            </ion-fab>
+            <store-app-repository-upload-task [folderPath]='folderPath' [imgInfo]="sharedFilesInfo[0]" (click)="openPhotoModal(sharedFilesInfo)"
+            (downloadComplete)="onDownloadUrlChange($event, sharedFilesInfo[0], sharedFilesInfo)" (cancel)="onUploadCancel(sharedFilesInfo[0], sharedFilesInfo)">
+          </store-app-repository-upload-task>
+            <!-- <ion-thumbnail class="big-thumb" style="opacity: 0.6;" (click)="openPhotoModal(index)">
+              <ion-img [src]="sharedFile.imgUrl"></ion-img>
+            </ion-thumbnail> -->
+          </div>
+        </ion-col>
+      
+        <ion-col *ngIf='formimages && formimages.length>0'>
+          <div  [class.box-shadow-3d]="formimages.length > 1" class="big-thumb">
+            <ion-thumbnail class="big-thumb" (click)="openPhotoModal(formimages)">
+      
+              <ion-img [src]="formimages[0]"></ion-img>
+            </ion-thumbnail>
+          </div>
+        </ion-col>
+      
+        <ion-col *ngIf='newUrls && newUrls.length > 0'>
+          <div  [class.box-shadow-3d]="newUrls.length > 1" class="big-thumb" (click)="openPhotoModal(newUrls)">
+            <ion-thumbnail class="big-thumb">
+      
+              <ion-img [src]="newUrls[0]"></ion-img>
+            </ion-thumbnail>
+          </div>
+      
+        </ion-col>
+      
+      
+      </ion-row>
+  
+  
+  
+  
+      <!-- <ion-fab-button style="position: relative;" class="small-margin sequare-fab" >
+        <ion-icon name="camera-outline"></ion-icon>
+      </ion-fab-button> -->
+  
+  
+  
+  
+  
+    </div>
+  
+  <input type="file" id='fileInput' #fileInput hidden="true" (change)='onFileSelected($event);' multiple>
+  
+  <ion-modal #modal trigger="open-modal" [presentingElement]="presentingElement">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="modal.dismiss()">
+              <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-title>الصور</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="modal-content ">
+  
+            <ng-container [ngSwitch]="modalImages">
+              <ng-container  *ngSwitchCase="formimages">
+                <div class="container">
+  
+                          <div  class="ion-margin-bottom child"  *ngFor='let img of formimages; let i=index '>
+                            <div [id]="i">
+                              <div class="relative-container ">
+                                <ion-fab vertical="top" horizontal="center" edge slot="fixed">
+                                  <ion-fab-button (click)="onIamgeRemoved(img)" size="small">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                  </ion-fab-button>
+                                </ion-fab>
+                          
+                                <ion-img class="ion-margin-vertical" [src]="img"></ion-img>
+                              </div>
+                            </div>
+                          </div>    
+                        </div>
+                      </ng-container>
+                
+              <ng-container  *ngSwitchCase="files">
+  
+               <div class="ion-margin-bottom" *ngFor='let file of files, let index'>
+              <div [id]="index">
+                <div class="relative-container">
+                  <store-app-repository-upload-task [slideMode]="true" [folderPath]='folderPath' [imgInfo]="file"
+                  (downloadComplete)="onDownloadUrlChange($event, file, files)" (cancel)="onUploadCancel(file, files)">
+                </store-app-repository-upload-task>
+                </div>
+              </div>
+            </div>   
+          </ng-container>
+  
+          <ng-container  *ngSwitchCase="sharedFilesInfo">
+  
+            <div class="ion-margin-bottom" *ngFor='let file of sharedFilesInfo, let index'>
+              <div [id]="index">
+                <div class="relative-container">
+                  <store-app-repository-upload-task [slideMode]="true" [folderPath]='folderPath' [imgInfo]="file"
+                  (downloadComplete)="onDownloadUrlChange($event, file, sharedFilesInfo)" (cancel)="onUploadCancel(file, sharedFilesInfo)">
+                </store-app-repository-upload-task>
+                </div>
+              </div>
+            </div>    
+   
+          </ng-container>
+  
+              
+  
+          <ng-container  *ngSwitchCase="newUrls">
+  
+            <div  class="ion-margin-bottom"   *ngFor='let img of newUrls; let index'>
+              <div [id]="index">
+                <div class="relative-container">
+                  <div style="position: relative;" class='ion-margin' >
+                    <ion-fab vertical="top" horizontal="center" edge slot="fixed">
+                      <ion-fab-button (click)="onIamgeRemoved(img)" size="small">
+                        <ion-icon name="trash-outline"></ion-icon>
+                      </ion-fab-button>
+                    </ion-fab>
+              
+                      <ion-img [src]="img"></ion-img>
+                  </div>
+                </div>
+              </div>
+            </div> 
+     
+          </ng-container>
+  
+  
+              
+  
+            </ng-container>
+   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+            
+            <!-- <ng-template swiperSlide *ngFor="let sharedFile of sharedFiles; let index" >
+              <div [id]="index">
+                <div class="relative-container">
+  
+                    <div  >
+                      <ion-fab vertical="top" horizontal="center" edge slot="fixed">
+                        <ion-fab-button  size="small" (click)="openSharedFileInput(sharedFile)">
+                          <ion-icon name="create-outline"></ion-icon>
+                        </ion-fab-button>
+                      </ion-fab>
+                      <ion-img [src]="sharedFile.imgUrl"></ion-img>
+                  </div>
+          
+                </div>
+              </div>
+            </ng-template> -->
+  
+  
+      </ion-content>
+    </ng-template>
+  
+  

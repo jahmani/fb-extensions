@@ -6,6 +6,7 @@ import {
   AfterViewInit,
   ViewChild,
   Input,
+  InjectionToken,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -21,7 +22,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from '@angular/fire/storage';
-import { Product, imageMeta } from '@store-app-repository/app-models';
+import { FileInfo, FirebaseIdString, Product, ImageMeta } from '@store-app-repository/app-models';
 import { AsyncPipe, Location, NgFor, NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { ProductsDataService } from '../../dataServices/products-data.service';
@@ -30,7 +31,18 @@ import { TagsInputComponent } from '../../ui-components/TagsInput/tags-input.com
 import { Observable, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
 import { storeIdToken } from '../../app.routes';
+import { FormPhotoControlComponent } from '../../ui-components/FormPhotoControl/form-photo-control.component';
 
+export const FileIdGetterToken = new InjectionToken<(fileInfo:FileInfo)=>Promise<FirebaseIdString>>('FileIdGetterToken', )
+const getIdFactor = ()=>{
+  const ps = inject(ProductsDataService);
+  return async ()=>{
+    const newImageId = await ps.getNewDocId();
+    return newImageId;
+
+  }
+
+}
 @Component({
   selector: 'store-app-repository-edit-product-page',
   templateUrl: 'edit-product.page.html',
@@ -42,8 +54,12 @@ import { storeIdToken } from '../../app.routes';
     NgFor,
     TagsInputComponent,
     AsyncPipe,
-    NgIf
+    NgIf, 
+    FormPhotoControlComponent
   ],
+  providers:[
+    {provide:FileIdGetterToken, useFactory:getIdFactor}
+  ]
 })
 export class EditProductPageComponent implements AfterViewInit {
   @ViewChild(TagsInputComponent) tagsInputComponent:
@@ -89,7 +105,7 @@ export class EditProductPageComponent implements AfterViewInit {
   productForm: FormGroup;
   imagesArray: FormArray;
   selectedImageSrc: string | ArrayBuffer | null | undefined;
-  imgProperties: imageMeta | undefined;
+  imgProperties: ImageMeta | undefined;
   selectedFile: File | undefined;
   imageIdsArray: FormArray;
   productTags: Observable<string[]>;
@@ -110,7 +126,7 @@ export class EditProductPageComponent implements AfterViewInit {
       modelNo: [''],
       size: [''],
       color: [''],
-      images: this.formBuilder.array([]),
+      images: [''],
       imageIds: this.formBuilder.array([]),
       imagesInfo: this.formBuilder.array([]),
       tags: [''],
@@ -172,13 +188,13 @@ export class EditProductPageComponent implements AfterViewInit {
     this.imageIdsArray.removeAt(index);
   }
 
-  imgLoaded(evt: any) {
-    if (evt && evt.target) {
-      const target: HTMLImageElement = evt.target;
-      this.imgProperties = this.getHtmlImageDimentions(target);
-      this.uploadImage();
-    }
-  }
+  // imgLoaded(evt: any) {
+  //   if (evt && evt.target) {
+  //     const target: HTMLImageElement = evt.target;
+  //     this.imgProperties = this.getHtmlImageDimentions(target);
+  //     this.uploadImage();
+  //   }
+  // }
 
   getHtmlImageDimentions(target: HTMLImageElement) {
     const width = target.naturalWidth;

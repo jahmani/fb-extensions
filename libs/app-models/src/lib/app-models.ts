@@ -3,6 +3,9 @@ import type { UserInfo } from '@angular/fire/auth';
 import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import type {UploadTaskSnapshot, UploadTask, StorageReference} from '@angular/fire/storage'
+import type { CropperPosition, ImageTransform, OutputFormat } from 'ngx-image-cropper';
+import { SafeResourceUrl } from '@angular/platform-browser';
+
 export function appModels(): string {
   return 'app-models';
 }
@@ -45,12 +48,13 @@ export interface Extendable extends DocumentData {
 export interface Extension {
   [prop: string]: unknown;
 }
-export interface imageMeta {
+export interface ImageMeta {
+  subName: string;
   width: number;
   height: number;
 }
-export interface productImagesMeta {
-  [imageId: FirebaseIdString]: imageMeta;
+export interface ProductThumpsProperties {
+  [imageId: FirebaseIdString]: ImageMeta;
 }
 
 export interface ProductVariant {
@@ -95,7 +99,7 @@ export interface Product extends Editable, Extendable, ProductGalleryDoc {
   sizes: string[];
   colors: string[];
   imageIds: FirebaseIdString[];
-  imagesMeta: productImagesMeta;
+  thumbProperties: ProductThumpsProperties;
   tags: string[];
   balance: number;
   origin: string;
@@ -144,11 +148,15 @@ export interface FileInfo{
   type: string;
   size: number;
   data?: string;
-  ext: string;
+  ext: OutputFormat;
   file: File;
+  imageMeta: ImageMeta
+  thumbsMeta: ImageMeta[]
+  docId: FirebaseIdString,
   croppeDataBlob?: Blob;
   croppedData?: string;
-  uploadTaskData?: UploadTaskComponentData;
+  downloadUrl: string;
+  uploadTaskData: UploadTaskComponentData;
   cropperData? :{
     position: CropperPosition;
     cropperTransformData? :  ImageTransform;
@@ -156,13 +164,16 @@ export interface FileInfo{
   }
 }
 
+export interface SharedFile {
+  file: File;
+  imgUrl: string;
+}
+
 export interface UploadTaskComponentData{
   dataUri: string;
   fileData: string | ArrayBuffer;
-  imgLoaded : boolean;
   lImgInfo: FileInfo;
-  safeDataUrl: string;
-
+  safeDataUrl: SafeResourceUrl;
   downloadUrlChange : EventEmitter<string>;
   cancel : EventEmitter<boolean>;
   task: UploadTask;
