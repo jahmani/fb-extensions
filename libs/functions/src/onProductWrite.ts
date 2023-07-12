@@ -3,9 +3,10 @@
 
 import * as functions from "firebase-functions";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { Product } from "../../app-models/src";
 const firestore = getFirestore();
 
-export const updateImageReferences = functions.firestore
+export const updateImageReferences1 = functions.firestore
     .document('stores/{storeId}/galleries/default/products/{productId}')
     .onWrite(async (change, context) => {
     const updatedProduct = change.after.exists ? change.after.data() : null;
@@ -38,6 +39,40 @@ export const updateImageReferences = functions.firestore
     }
     await batch.commit();
     console.log(`Updated image references for product: ${productId}`);
+});
+export const updateImageReferences = functions.firestore
+.document('stores/{storeId}/galleries/default/products/{productId}')
+.onWrite(async (change, context) => {
+const updatedProduct = (change.after.exists ? change.after.data() : null) as Product;
+const previousProduct = change.before.exists ? change.before.data() : null;
+const storeId = context.params.storeId;
+const productId = context.params.productId;
+const storeRef = firestore.collection('stores').doc(storeId);
+const updatedImageIds = (updatedProduct ? updatedProduct.imageIds || [] : []);
+const previousImageIds = (previousProduct ? previousProduct.imageIds || [] : []);
+console.info('updatedImageIds', updatedImageIds)
+const addedImageIds = updatedImageIds.filter((url: string) => !previousImageIds.includes(url));
+const removedImageIds = previousImageIds.filter((url: string) => !updatedImageIds.includes(url));
+const batch = firestore.batch();
+for (const imageId of addedImageIds) {
+    // const imageId = getImageIdFromURL(addedURL);
+    const imageDocRef = storeRef.collection('productPhotos').doc(imageId);
+    console.info("imageDocRef", imageDocRef.path)
+    imageDocRef.update( {
+        refCount: FieldValue.increment(1),
+        linkedProducts: FieldValue.arrayUnion(productId),
+    });
+}
+for (const imageId of removedImageIds) {
+    // const imageId = getImageIdFromURL(removedURL);
+    const imageDocRef = storeRef.collection('productPhotos').doc(imageId);
+    batch.update(imageDocRef, {
+        refCount: FieldValue.increment(-1),
+        linkedProducts: FieldValue.arrayRemove(productId),
+    });
+}
+await batch.commit();
+console.log(`Updated image references for product: ${productId}`);
 });
 function getImageIdFromURL(downloadUrl: string) {
     // Extract the image ID from the imageURL

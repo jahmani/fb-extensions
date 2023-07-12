@@ -105,9 +105,11 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   }
 
   onUploadCanceled() {
-    if (this.imgInfo && this.imgInfo.uploadTaskData) {
+    if (this.imgInfo) {
       if (this.imgInfo.uploadTaskData.task) {
         this.imgInfo.uploadTaskData.task.cancel();
+        this.imgInfo.uploadTaskData.cancel.emit();
+
       } else {
         this.imgInfo.uploadTaskData.cancel.emit();
       }

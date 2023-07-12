@@ -18,6 +18,7 @@ import {
   FormBuilder,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
+  FormControl,
 } from '@angular/forms';
 import {
   Platform,
@@ -67,7 +68,15 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit {
     return this.ionFocus ? this.cssColor : null;
   }
   @HostBinding('class.active') _isFocus = false;
-  @HostBinding('class.readonly') @Input() readonly = false;
+  @HostBinding('class.readonly') @Input()  set readonly(val:boolean){
+    if (val) {
+      this.tagInputCtrl.disable()
+
+    } else {
+      this.tagInputCtrl.enable()
+
+    }
+  };
 
   _once = false;
   @Input() mode = '';

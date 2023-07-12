@@ -4,26 +4,37 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="saveProductToFirestore(productForm.value)">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        save
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <form [formGroup]="productForm" (ngSubmit)="saveProductToFirestore(productForm.value)">
+  <form [formGroup]="productForm"  (ngSubmit)="saveProductToFirestore(productForm.value)">
 
     <store-app-repository-tags-input type="array"
       [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
-
 
     <ion-item>
       <ion-input label="Name" formControlName="name"></ion-input>
     </ion-item>
 
+<!-- 
 
+    <store-app-repository-tags-input type="array" formControlName="tags" [maxTags]="1" [suggestions]="(productTags| async) || []"
+      label="tags"></store-app-repository-tags-input> -->
+      <form formGroupName="customProperties">
+        <store-app-repository-tags-input type="array" formControlName="batch"  [maxTags]="1" [suggestions]="(batchOptions| async) || []"
+        label="batch"></store-app-repository-tags-input>
+      </form>
 
-    <store-app-repository-tags-input type="array" formControlName="tags" [suggestions]="(productTags| async) || []"
-      label="tags"></store-app-repository-tags-input>
     <ion-item>
       <ion-input label="Price" type="number" formControlName="price"></ion-input>
     </ion-item>
+    <store-app-repository-form-photo-control  formControlName="thumbProperties"></store-app-repository-form-photo-control>
 
     <ion-item>
       <ion-input label="Brand" formControlName="brand"></ion-input>
@@ -54,7 +65,6 @@
       <input type="file" #fileInput (change)="readImgFile($event)">
       <img [src]="selectedImageSrc" (load)="imgLoaded($event)">
      </ion-item> -->
-     <store-app-repository-form-photo-control  formControlName="images"></store-app-repository-form-photo-control>
 <!-- 
     <div formArrayName="images">
       <ion-item *ngFor="let imageControl of imagesArray.controls; let i = index">
@@ -64,13 +74,13 @@
       </ion-item>
     </div> -->
 
-    <div formArrayName="imageIds">
+    <!-- <div formArrayName="imageIds">
       <ion-item *ngFor="let imageControl of imageIdsArray.controls; let i = index">
         <ion-input [formControlName]="i"></ion-input>
         <ion-button (click)="removeImageId(i)">Remove</ion-button>
       </ion-item>
     </div>
-
+ -->
 
 
     <ion-item>

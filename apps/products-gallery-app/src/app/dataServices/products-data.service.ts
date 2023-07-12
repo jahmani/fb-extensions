@@ -26,9 +26,11 @@ export class ProductsDataService extends EditableFirestoreService<Product> {
     console.log('product: ', product);
     const res = super.toFirestore(product);
     const tagsArray = (product as Product).tags;
-    const tagsObj = tagsArrayToTagsObj(tagsArray);
-    if (tagsObj) {
-      res['tags'] = tagsObj;
+    if (tagsArray) {
+      const tagsObj = tagsArrayToTagsObj(tagsArray);
+      if (tagsObj) {
+        res['tags'] = tagsObj;
+      }     
     }
     return res;
   }

@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"codegpt.apiKey": "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"
+	}
 }

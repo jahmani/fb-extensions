@@ -32,6 +32,7 @@ export class ImageCropModalComponent implements OnInit {
 
   private croppedImageBase64 = '';
   #imgInfo: FileInfo | null = null;
+  croppedBlob: Blob | undefined;
   /**
    * Image to be cropped as a base64 string.
    * Should be passed in from the component calling this modal.
@@ -90,6 +91,9 @@ export class ImageCropModalComponent implements OnInit {
   imageCropped(event: ImageCroppedEvent) {
     console.log('this.imageCropper.format', this.imageCropper?.format);
 
+    if (event.blob) {
+      this.croppedBlob = event.blob
+    }else 
     if (event.base64) {
       this.croppedImageBase64 = event.base64;
     }
@@ -97,7 +101,7 @@ export class ImageCropModalComponent implements OnInit {
   }
 
   dismissModal(croppedImageBase64?: string) {
-    const blob = base64ToFile(this.croppedImageBase64);
+    const blob = this.croppedBlob ||  base64ToFile(this.croppedImageBase64);
     // const croppedUrl = URL.createObjectURL(File);
     if (this.imgInfo) {
       this.imgInfo.croppeDataBlob = blob;

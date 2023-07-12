@@ -54,7 +54,7 @@ export interface ImageMeta {
   height: number;
 }
 export interface ProductThumpsProperties {
-  [imageId: FirebaseIdString]: ImageMeta;
+  [imageId: FirebaseIdString]: ImageMeta[];
 }
 
 export interface ProductVariant {
@@ -72,6 +72,15 @@ export interface ProductVariant {
 
 export interface GallaryHelperDoc extends Editable, Extendable, ProductGalleryDoc {
   id: FirebaseIdString;
+}
+export interface CustomProperyOption{
+  value: string;
+  freq: number;
+  lastEditedOn?: Timestamp
+}
+export interface CustomPropery extends Editable, Extendable {
+  name: string,
+  options: CustomProperyOption[];
 }
 
 export interface ProductTag{
@@ -91,19 +100,25 @@ export interface ProductDocTags{
 export interface Product extends Editable, Extendable, ProductGalleryDoc {
   name: string;
   namePrefexes: string[];
-  price: number;
-  brand: string;
-  costPrice: number;
-  note: string;
+  nameParts: {[partNumber:string]:string};
   modelNos: string[];
+  price?: number;
+
+  brand: string;
+  costPrice?: number;
+  note: string;
   sizes: string[];
   colors: string[];
-  imageIds: FirebaseIdString[];
-  thumbProperties: ProductThumpsProperties;
-  tags: string[];
-  balance: number;
-  origin: string;
+  origin?: string;
+
+  imageIds?: FirebaseIdString[];
+  thumbProperties?: ProductThumpsProperties;
+ 
+  tags?: string[]
+  balance?: number;
   variants: { [id: FirebaseIdString]: ProductVariant };
+
+  customProperties: { [cpName: string]: string | number | null };
 }
 
 export interface User extends WithId {

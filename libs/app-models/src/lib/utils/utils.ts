@@ -49,3 +49,4 @@ export function getFileExtension(fname: string) {
 
   return ext; // ? "." + ext : ext;
 }
+
