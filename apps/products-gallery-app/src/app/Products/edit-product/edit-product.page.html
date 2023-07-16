@@ -34,6 +34,8 @@
     <ion-item>
       <ion-input label="Price" type="number" formControlName="price"></ion-input>
     </ion-item>
+    <store-app-repository-tags-input type="array" formControlName="modelNo"  [maxTags]="10"
+    label="ModelNo"></store-app-repository-tags-input>
     <store-app-repository-form-photo-control  formControlName="thumbProperties"></store-app-repository-form-photo-control>
 
     <ion-item>
@@ -48,9 +50,9 @@
       <ion-input label="Notice" formControlName="notice"></ion-input>
     </ion-item>
 
-    <ion-item>
+    <!-- <ion-item>
       <ion-input label="Model No" formControlName="modelNo"></ion-input>
-    </ion-item>
+    </ion-item> -->
 
     <ion-item>
       <ion-input label="Size" formControlName="size"></ion-input>

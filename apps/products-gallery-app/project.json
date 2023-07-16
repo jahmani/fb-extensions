@@ -33,7 +33,9 @@
             "input": "apps/products-gallery-app/src/theme/variables.scss"
           }
         ],
-        "scripts": []
+        "scripts": [],
+        "serviceWorker": true,
+        "ngswConfigPath": "apps/products-gallery-app/ngsw-config.json"
       },
       "configurations": {
         "production": {

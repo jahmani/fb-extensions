@@ -1,5 +1,5 @@
 export const environment = {
-  useEmulators: true,
+  useEmulators: false,
   production: false,
   firebase: {
     projectId: 'store-gallary',

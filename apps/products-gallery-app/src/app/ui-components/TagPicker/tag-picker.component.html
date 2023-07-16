@@ -12,5 +12,16 @@
         *ngFor="let t of tags; let index" color="tertiary" mode="ios" outline="true">
         <ion-label>{{ t }}</ion-label>
       </ion-chip>
+      <ng-container *ngIf="!tags || !tags.length; else elseTemplate">
+        <ion-chip [ngClass]="{unSelectedChips: !isFocused}"
+        *ngFor="let t of [1,1,1,1]; let index" color="tertiary" mode="ios" outline="true">
+        <ion-label>          <ion-skeleton-text animated style="width: 50px; height: 100%;"></ion-skeleton-text>
+        </ion-label>
+      </ion-chip>     
+      </ng-container>
+      <ng-template #elseTemplate>
+        
+      </ng-template>
+      
     </div>
   </div>

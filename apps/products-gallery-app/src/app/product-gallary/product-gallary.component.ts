@@ -66,6 +66,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   selectedTags$: Observable<string[]> | undefined;
   productBatchsOptionValues$: Observable<string[]>;
   selectedBatchs$: Observable<string[] > | undefined;
+  loaded= false;
   constructor() {
     const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
     this.productTags$ = productTagsDoc.pipe(
@@ -136,12 +137,13 @@ export class ProductGallaryComponent implements AfterViewInit {
 
       this.products$ = this.selectedWord$.pipe(
         combineLatestWith(this.selectedBatchs$),
-        switchMap(([val, selectedBatchs]) => {
-          console.log('val', val, 'selectedTags: ', selectedBatchs);
+        switchMap(([namePrefex, selectedBatchs]) => {
+          console.log('val', namePrefex, 'selectedTags: ', selectedBatchs);
+          this.loaded = false;
           //  let queriedProducts: Observable<Product[]>;
           let q: QueryConstraint[] = [];
-          if (val) {
-            q = [...q, where('namePrefexes', 'array-contains' , val)];
+          if (namePrefex) {
+            q = [...q, where('namePrefexes', 'array-contains' , namePrefex)];
 
             // const nameParts = val.split(' ');
             // if (nameParts && nameParts.length) {
@@ -160,7 +162,9 @@ export class ProductGallaryComponent implements AfterViewInit {
           q = [...q, orderBy('lastEditedOn','desc')]
           const queriedProducts = this.productsService.getQueryedDocs$(q);
 
-          return queriedProducts;
+          return queriedProducts.pipe(tap(()=>{
+            this.loaded = true;
+          }));
         }),
         tap((products) => {
           console.log('products: ', products);
@@ -191,5 +195,8 @@ export class ProductGallaryComponent implements AfterViewInit {
       url = `https://storage.googleapis.com/${BUCKET_NAME}/${OBJECT_NAME}`;
     }
     return url;
+  }
+  trackBy(index: number, name: Product): string {
+    return name.id;
   }
 }

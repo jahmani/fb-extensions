@@ -118,7 +118,7 @@ export abstract class WithIdFirestoreService<T extends WithId> {
       return this.getDocs$(undefined,this.lastDoc, docLimit)
   }
 
-  getDocs$(
+  private getDocs$(
     queryConstraints?: QueryConstraint[],
     startAfterDoc?: DocumentSnapshot,
     docLimit?: number
