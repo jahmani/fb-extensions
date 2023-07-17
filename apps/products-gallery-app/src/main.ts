@@ -31,7 +31,6 @@ import { provideServiceWorker } from '@angular/service-worker';
 bootstrapApplication(AppComponent, {
   providers: [
     {
-        
         provide: environmentToken,
         useValue: {
             useEmulator: environment.useEmulators,
@@ -68,6 +67,10 @@ bootstrapApplication(AppComponent, {
         }
         return stoarge;
     })),
+    provideServiceWorker('ngsw-worker.js', {
+        enabled: !isDevMode(),
+        registrationStrategy: 'registerWhenStable:30000'
+    }),
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'

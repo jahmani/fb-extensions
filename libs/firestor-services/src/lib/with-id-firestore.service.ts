@@ -28,6 +28,7 @@ import {
   catchError,
   throwError,
   from,
+  shareReplay,
 } from 'rxjs';
 import { FirebaseloggerService } from './firebaselogger.service';
 
@@ -115,7 +116,7 @@ export abstract class WithIdFirestoreService<T extends WithId> {
       return this.getDocs$(queryConstraints,undefined, docLimit)
   }
   getMoreDocs$( docLimit?: number){
-      return this.getDocs$(undefined,this.lastDoc, docLimit)
+      return this.getDocs$(this.currentQueryConstraints,this.lastDoc, docLimit)
   }
 
   private getDocs$(
@@ -159,6 +160,7 @@ export abstract class WithIdFirestoreService<T extends WithId> {
         return dList;
         // return sort<T>(dList, 'firstCreatedOn', asc);
       }),
+      shareReplay({bufferSize:1, refCount:true}),
       catchError((err) => {
         console.log(`error streaming at [${this._basePath}] [collection$]`);
         return throwError(err);
