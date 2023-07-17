@@ -12,9 +12,19 @@
 <ion-content>
   <store-app-repository-tags-input #productNameWordsInput type="array"
     [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
-  <store-app-repository-tags-input #productBatchsOptionValuesInput [showInputCtrl]=true type="array" label="الدقعة"
+  <store-app-repository-tags-input #productBatchsOptionValuesInput [showInputCtrl]=true type="array" label="الدفعة"
     [suggestions]="(productBatchsOptionValues$|async) || []"></store-app-repository-tags-input>
-  <cdk-virtual-scroll-viewport itemSize="auto" class="ion-content-scroll-host">
+      <cdk-virtual-scroll-viewport itemSize="auto" class="ion-content-scroll-host">
+    
+      <ion-item *ngIf="docCount$|async as count, else noDocCount">
+      <ion-label>found {{count}} products</ion-label>
+    </ion-item>
+    <ng-template #noDocCount>
+      <ion-item >
+        <ion-label> <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text></ion-label>
+      </ion-item>
+    </ng-template>
+    
     <div class="gallary_container" *ngIf="!this.loaded; else loaded">
       <ng-container
         *ngFor="let  prod of [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; let i=index">
@@ -38,7 +48,7 @@
                 <div class=" card-content">
                   <div class="slides" *ngIf="prod!.imageIds && prod.imageIds[0]">
                     <div id="slide-1" class=" image_container" *ngFor="let item of prod!.imageIds">
-                      <img loading="lazy" [src]="item |imgIdtoThumbUre:600" alt="{{prod.name}}" fill />
+                      <img  [src]="item |imgIdtoThumbUre:600" [storeAppRepositoryHydratedImg]="item |imgIdtoThumbUre:200" alt="{{prod.name}}" fill />
                     </div>
                   </div>
                 </div>
