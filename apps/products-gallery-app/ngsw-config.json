@@ -26,5 +26,17 @@
         ]
       }
     }
-  ]
+  ],
+    "dataGroups": [{
+    "name": "api-freshness",
+    "urls": [
+      "https://storage.googleapis.com/store-gallary.appspot.com/stores/*/productPhotos/thumbs/*"
+    ],
+    "cacheConfig": {
+      "maxSize": 300,
+      "maxAge": "30d",
+      "timeout": "10s",
+      "strategy": "performance"
+    }
+  }]
 }
