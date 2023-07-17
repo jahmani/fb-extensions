@@ -25,11 +25,11 @@
     </div>
     <ng-template #loaded>
       <div class="gallary_container" *ngIf=" products$|async as products ">
-      
-        <ng-container *ngFor="let  prod of products; trackBy: trackBy; let i=index">
+
+        <ng-container *ngFor="let  prod of ProductsInstance; trackBy: trackBy; let i=index">
           <div class="image_container" (click)="previewProduct === prod ? previewProduct= null : previewProduct = prod">
-            <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]" 
-              [src]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" fill />
+            <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]"
+              [ngSrc]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" priority="i<22" fill />
           </div>
           <div class="prod-preview" *ngIf="previewProduct === prod" [routerLink]="['../edit-product', prod.id]">
             <div class="prod-preview-content">
@@ -41,9 +41,7 @@
                       <img loading="lazy" [src]="item |imgIdtoThumbUre:600" alt="{{prod.name}}" fill />
                     </div>
                   </div>
-
                 </div>
-
                 <ion-text class="card-title" color="primary">
                   <h1>{{prod.name}}</h1>
                 </ion-text>
@@ -52,25 +50,25 @@
             </div>
 
           </div>
-        <ng-container *ngIf="products.length < 2">
-          <div class="image_container placeholder">
-          </div>
+          <ng-container *ngIf="products.length < 2">
+            <div class="image_container placeholder">
+            </div>
+          </ng-container>
           <ng-container *ngIf="products.length < 3">
             <div class="image_container placeholder">
             </div>
-
           </ng-container>
-        </ng-container> </ng-container>
+        </ng-container>
 
 
 
 
-    </div>
-    <ion-infinite-scroll>
-      <ion-infinite-scroll-content></ion-infinite-scroll-content>
-    </ion-infinite-scroll>
+      </div>
+      <ion-infinite-scroll (ionInfinite)="onInfinitScroll($event)">
+        <ion-infinite-scroll-content></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </ng-template>
-    
+
 
 
 

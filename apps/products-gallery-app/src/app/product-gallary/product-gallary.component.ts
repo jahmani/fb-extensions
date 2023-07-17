@@ -1,16 +1,19 @@
-import { AfterViewInit, Component, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ViewChildren, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Product } from '@store-app-repository/app-models';
 import {
   Observable,
+  combineLatest,
   combineLatestWith,
+  firstValueFrom,
   map,
   of,
+  scan,
   startWith,
   switchMap,
   tap,
 } from 'rxjs';
-import { IonicModule } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonicModule } from '@ionic/angular';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ProductsDataService } from '../dataServices/products-data.service';
 import { TagsInputComponent } from '../ui-components/TagsInput/tags-input.component';
@@ -51,6 +54,7 @@ export class ProductGallaryComponent implements AfterViewInit {
     @ViewChild('productBatchsOptionValuesInput') productBatchsInputComponent:
     | TagsInputComponent
     | undefined;
+    @ViewChild(IonInfiniteScroll) infinitScroll: IonInfiniteScroll | undefined;
   storeId = inject(storeIdToken);
   private productsService = inject(ProductsDataService);
   private suggestionsService = inject(WordSuggestionsDataService);
@@ -67,6 +71,8 @@ export class ProductGallaryComponent implements AfterViewInit {
   productBatchsOptionValues$: Observable<string[]>;
   selectedBatchs$: Observable<string[] > | undefined;
   loaded= false;
+  scrollEvents: Observable<CustomEvent<void> | 'initialLoad'> | undefined;
+  ProductsInstance: Product[] =[];
   constructor() {
     const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
     this.productTags$ = productTagsDoc.pipe(
@@ -135,36 +141,68 @@ export class ProductGallaryComponent implements AfterViewInit {
         this.selectedBatchs$ = of([]);
       }
 
+      if (this.infinitScroll) {
+        this.scrollEvents = this.infinitScroll.ionInfinite;
+      } else{
+        this.scrollEvents = of('initialLoad')
+      }
+
       this.products$ = this.selectedWord$.pipe(
         combineLatestWith(this.selectedBatchs$),
         switchMap(([namePrefex, selectedBatchs]) => {
           console.log('val', namePrefex, 'selectedTags: ', selectedBatchs);
           this.loaded = false;
-          //  let queriedProducts: Observable<Product[]>;
+
           let q: QueryConstraint[] = [];
           if (namePrefex) {
             q = [...q, where('namePrefexes', 'array-contains' , namePrefex)];
-
-            // const nameParts = val.split(' ');
-            // if (nameParts && nameParts.length) {
-            //   for (let index = 0; index < nameParts.length; index++) {
-            //     const namePart = nameParts[index];
-            //     q = [...q, where('nameParts.' + index, '==', namePart)];
-            //   }
-            // }
           }
           if (selectedBatchs && selectedBatchs.length) {
-            // for (let index = 0; index < selectedBatchs.length; index++) {
-            //   const tag = selectedBatchs[index];
               q = [...q, where('customProperties.' + 'batch', 'in', selectedBatchs)];
-            // }
           }
           q = [...q, orderBy('lastEditedOn','desc')]
-          const queriedProducts = this.productsService.getQueryedDocs$(q);
+           const queriedProducts = this.productsService.getQueryedDocs$(q,21);
+          // const allParts  = [queriedProducts];
+          // const allProducts = combineLatest(allParts).pipe(map(parts=>parts.flat()))
+          // if (!this.infinitScroll) {
+          //   return  of([]as Product[])
+          // }
+          // const scrollEvent = this.infinitScroll.ionInfinite.pipe(startWith("InititalLoad")) ;
+          // const morProducts = scrollEvent.pipe
+          // (
+          //   switchMap((ev=>{
+          //     if (ev === 'InititalLoad') {
+          //       return this.productsService.getQueryedDocs$(q,21);
+          //     } else {
+          //       const isEvent =  ev as InfiniteScrollCustomEvent;
+          //       isEvent.target.complete()
+          //       const morProducts = this.productsService.getMoreDocs$(21);
+          //       return morProducts;
+          //     }
 
-          return queriedProducts.pipe(tap(()=>{
+          //   }))
+          // )
+          // const morAndMor = morProducts.pipe(scan((acc, value, index)=>{
+          //   console.log('scanIndex: ', index)
+          //   // if (index%2 === 1) {
+          //   //   return acc;
+          //   // }
+          //   if (value.length === 0 && this.infinitScroll) {
+          //     this.infinitScroll.disabled = true
+          //   }
+          //   const concat = acc.concat(value);
+          //   return concat;
+          // }))
+          // return morAndMor;
+          return queriedProducts.pipe(tap((products)=>{
             this.loaded = true;
+            this.ProductsInstance  = products;
+            if (this.infinitScroll) {
+              this.infinitScroll.disabled = false;
+            }
           }));
+
+
         }),
         tap((products) => {
           console.log('products: ', products);
@@ -182,6 +220,23 @@ export class ProductGallaryComponent implements AfterViewInit {
         })
       );
     }
+  }
+
+  onInfinitScroll(ev: Event){
+                   const isEvent =  ev as InfiniteScrollCustomEvent;
+                isEvent.target.complete()
+                const morProducts = this.productsService.getMoreDocs$(21);
+                firstValueFrom(morProducts).then((more)=>{
+                  if (more.length) {
+                    this.ProductsInstance = this.ProductsInstance.concat(more)
+
+                  } else {
+                    isEvent.target.disabled = true;
+                  }
+                })
+
+               // return morProducts;
+
   }
 
   // http://127.0.0.1:9199/v0/b/store-gallary.appspot.com/o/stores%5CtHP7s3ysRD4IU45Z0j8N%5CproductPhotos%5Cthumbs%5Cvj6gyRTCersZW44VNh0O_1500x1500.jpeg?alt=media&token=597d48a7-e378-40ec-8d89-9f6f90ccf1b7
