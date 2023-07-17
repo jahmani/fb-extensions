@@ -18,6 +18,7 @@ import {
   CollectionReference,
   limit,
   DocumentSnapshot,
+  getCountFromServer,
 } from 'firebase/firestore';
 import {
   Observable,
@@ -103,6 +104,24 @@ export abstract class WithIdFirestoreService<T extends WithId> {
     );
   }
 
+  getDocCount(    queryConstraints?: QueryConstraint[]    ){
+    const docsCount$ = from(this.collectionRef).pipe(
+      map((collRef) => {
+          let queryFn ;
+          if (queryConstraints) {
+            queryFn =  query<T>(collRef, ...queryConstraints)
+          } else {
+            queryFn =  query<T>(collRef)
+          }
+          return queryFn;
+        }
+      ), switchMap((v=>{
+        return getCountFromServer(v)
+      })), map(docCount=> docCount.data().count));
+
+      return docsCount$;
+      
+  }
 
   getAllDocs$(){
     return this.getDocs$();

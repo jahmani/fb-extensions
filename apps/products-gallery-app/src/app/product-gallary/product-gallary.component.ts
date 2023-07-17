@@ -26,6 +26,7 @@ import { storeIdToken } from '../app.routes';
 import { ImgIdtoThumbUrePipe } from '../ui-components/img-idto-thumb-ure.pipe';
 import { StoreCustomPropertiesService } from '../dataServices/store-custom-properties.service';
 import { orderBy } from 'firebase/firestore';
+import { HydratedImgDirective } from '../ui-components/hydrated-img.directive';
 
 @Component({
   selector: 'store-app-repository-product-gallary',
@@ -38,6 +39,7 @@ import { orderBy } from 'firebase/firestore';
     TagsInputComponent,
     RouterLink,
     ImgIdtoThumbUrePipe,
+    HydratedImgDirective
   ],
   templateUrl: './product-gallary.component.html',
   styleUrls: ['./product-gallary.component.scss'],
@@ -73,6 +75,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   loaded= false;
   scrollEvents: Observable<CustomEvent<void> | 'initialLoad'> | undefined;
   ProductsInstance: Product[] =[];
+  docCount$: Observable<number> | undefined;
   constructor() {
     const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
     this.productTags$ = productTagsDoc.pipe(
@@ -147,9 +150,9 @@ export class ProductGallaryComponent implements AfterViewInit {
         this.scrollEvents = of('initialLoad')
       }
 
-      this.products$ = this.selectedWord$.pipe(
+      const queryConstraints$ = this.selectedWord$.pipe(
         combineLatestWith(this.selectedBatchs$),
-        switchMap(([namePrefex, selectedBatchs]) => {
+        map(([namePrefex, selectedBatchs]) => {
           console.log('val', namePrefex, 'selectedTags: ', selectedBatchs);
           this.loaded = false;
 
@@ -161,6 +164,11 @@ export class ProductGallaryComponent implements AfterViewInit {
               q = [...q, where('customProperties.' + 'batch', 'in', selectedBatchs)];
           }
           q = [...q, orderBy('lastEditedOn','desc')]
+          return q;
+        }))
+        this.docCount$ = queryConstraints$.pipe(switchMap(q=>this.productsService.getDocCount(q)));
+
+        this.products$ = queryConstraints$.pipe(switchMap(q=>{
            const queriedProducts = this.productsService.getQueryedDocs$(q,21);
           // const allParts  = [queriedProducts];
           // const allProducts = combineLatest(allParts).pipe(map(parts=>parts.flat()))
