@@ -68,15 +68,13 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit {
     return this.ionFocus ? this.cssColor : null;
   }
   @HostBinding('class.active') _isFocus = false;
-  @HostBinding('class.readonly') @Input()  set readonly(val:boolean){
+  @HostBinding('class.readonly') @Input() set readonly(val: boolean) {
     if (val) {
-      this.tagInputCtrl.disable()
-
+      this.tagInputCtrl.disable();
     } else {
-      this.tagInputCtrl.enable()
-
+      this.tagInputCtrl.enable();
     }
-  };
+  }
 
   _once = false;
   @Input() mode = '';
@@ -114,15 +112,21 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit {
   filteredSuggestion: string[] = [];
   private filterSelectedSuggestions() {
     const selectedTagsAsString = this._tags?.join(' ') || '';
-    const searchString = this.input?.nativeElement?.value || null;
+    let searchString: string = this.input?.nativeElement?.value || null;
     // const filterNotMatchedWithInput =this._suggestions.filter((t)=> t.indexOf(searchString) > -1 );
-    const filterSelected =
-      this._suggestions?.filter(
-        (t) =>
-          selectedTagsAsString.indexOf(t) === -1 &&
-          (!searchString || t.indexOf(searchString) > -1)
-      ) || [];
-    this.filteredSuggestion = filterSelected;
+
+    if (searchString) {
+      searchString = searchString.trim().toLowerCase();
+      const filterSelected =
+        this._suggestions?.filter(
+          (t) =>
+            selectedTagsAsString.indexOf(t) === -1 &&
+            t.indexOf(searchString) > -1
+        ) || [];
+      this.filteredSuggestion = filterSelected;
+    } else {
+      this.filteredSuggestion = this._suggestions;
+    }
   }
 
   @Input()
@@ -461,7 +465,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit {
   public alertInputs: AlertInput[] = [
     {
       placeholder: 'tag (max 8 characters)',
-      handler: (input) =>{
+      handler: (input) => {
         console.log(input);
       },
       attributes: {
@@ -477,22 +481,21 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit {
     {
       text: 'OK',
       role: 'confirm',
-      handler: (values: any)=>{
+      handler: (values: any) => {
         const res = values[0] as string;
         if (res && res.indexOf(' ') === -1) {
           this.pushTag(values[0]);
           return true;
         }
-        console.log(values)
+        console.log(values);
         return false;
-      }
+      },
     },
   ];
 
   setResult(ev: any) {
     this.isAlertOpen = false;
-
- }
+  }
 
   // async presentAlert() {
   //   const alert = await this.alertController.create({

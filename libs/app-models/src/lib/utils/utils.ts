@@ -50,3 +50,9 @@ export function getFileExtension(fname: string) {
   return ext; // ? "." + ext : ext;
 }
 
+export function objectToLowerCase(data: object){
+  const newData =  Object.fromEntries(Object.entries(data).map(
+    ([key, value]) => [key, typeof value == 'string' ? value.toLowerCase() : value]));
+    return newData;
+}
+

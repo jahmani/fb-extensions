@@ -98,3 +98,10 @@
   </form>
 
 </ion-content>
+<ion-alert
+  trigger="present-alert"
+  [isOpen]="showLeaveEditWarning"
+  header="الخروج قبل حفظ التغييرات؟!"
+  [buttons]="alertButtons"
+  (didDismiss)="showLeaveEditWarning = false"
+></ion-alert>

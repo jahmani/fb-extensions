@@ -15,17 +15,16 @@ import {
   FormArray,
   ReactiveFormsModule,
   FormControl,
-  FormRecord,
 } from '@angular/forms';
 
-import { FileInfo, FirebaseIdString, Product, ImageMeta, CustomPropery } from '@store-app-repository/app-models';
+import { FileInfo, FirebaseIdString, Product, ImageMeta } from '@store-app-repository/app-models';
 
 import { AsyncPipe, Location, NgFor, NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { ProductsDataService } from '../../dataServices/products-data.service';
 import { WordSuggestionsDataService } from '../../dataServices/word-suggestions-data.service';
 import { TagsInputComponent } from '../../ui-components/TagsInput/tags-input.component';
-import { Observable, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
+import { Observable, Subject, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
 import { storeIdToken } from '../../app.routes';
 import { FormPhotoControlComponent } from '../../ui-components/FormPhotoControl/form-photo-control.component';
@@ -85,6 +84,7 @@ export class EditProductPageComponent implements AfterViewInit {
   selectedWord$: Observable<string> | undefined;
   addNew =true;
   batchOptions: Observable<string[] | undefined>;
+  showLeaveEditWarning= false;
 
   // private _productId: string;
   @Input() set productId(value: string){
@@ -220,7 +220,7 @@ export class EditProductPageComponent implements AfterViewInit {
   }
 
   trasformBatchValue(arg: string[]){
-    return arg && arg[0];
+    return arg && arg[0] && arg[0].trim().toLowerCase();
   }
 
   // removeImage(index: number) {
@@ -318,7 +318,15 @@ if (product.customProperties) {
     product.customProperties['batch'] = this.trasformBatchValue(product.customProperties['batch'] as unknown as string[]) ||  null
   }
 }
-    const nameWords = product.name.split(' ') || [];
+product.name = product.name.trim().toLocaleLowerCase();
+if (product.brand) {
+  product.brand = product.brand.trim().toLocaleLowerCase();
+}
+if (product.modelNos) {
+  product.modelNos = product.modelNos.map(m=>m.trim().toLowerCase());
+}
+
+const nameWords = product.name.split(' ') || [];
     product.tags = product.tags || [];
     const namePrefexes = this.getNamePrefexes(nameWords);
     product.namePrefexes = namePrefexes;
@@ -332,6 +340,7 @@ if (product.customProperties) {
       // setDoc(productDocRef,product)
      return prom.then(() => {
         console.log('Product saved successfully.');
+        this.productForm.reset();
         this.location.back();
         //   this.productForm.reset();
         //   this.imagesArray.clear();
@@ -360,16 +369,43 @@ if (product.customProperties) {
 
   deleteProduct(productId: string){
     return this.productsService.delete(productId).then(()=>{
+      this.productForm.reset();
       this.location.back();
     })
   }
 
   canDeactivate(){
-    if (this.formPhotoComponent) {
+    if (this.formPhotoComponent && (this.formPhotoComponent.isHaveOpenModal() || this.formPhotoComponent.isHaveOpenUploadTaskModal())) {
       return this.formPhotoComponent.canDeactivate();
+    }
+    if (this.formPhotoComponent?.isBussy()) {
+      this.formPhotoComponent.alertBussy();
+      return false;
+    }
+    if (this.productForm.dirty) {
+      this.showLeaveEditWarning = true;
+      return this.showLeaveEditWarningSubject.asObservable();
     }
     return true;
   }
-
+  showLeaveEditWarningSubject = new Subject<boolean>()
+  public alertButtons = [
+    {
+      text: 'Cancel',
+      role: 'cancel',
+      handler: () => {
+        this.showLeaveEditWarning = false;
+        this.showLeaveEditWarningSubject.next(false);
+      },
+    },
+    {
+      text: 'OK',
+      role: 'confirm',
+      handler: () => {
+        this.showLeaveEditWarning = false;
+        this.showLeaveEditWarningSubject.next(true);
+      },
+    },
+  ];
 
 }
