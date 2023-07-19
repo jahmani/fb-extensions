@@ -53,7 +53,7 @@ export class LoginComponent implements OnInit {
                 photoURL: user.photoURL || undefined,
                 id: user.uid,                
               } as AppUser;
-              this.appUserInfoService.create(userDTO);
+              this.appUserInfoService.create(userDTO, user.uid);
             }
           });
         console.log(user, token);
