@@ -121,15 +121,15 @@ export interface Product extends Editable, Extendable, ProductGalleryDoc {
   customProperties: { [cpName: string]: string | number | null };
 }
 
-export interface User extends WithId {
+export interface AppUser extends Editable {
   uid: FirebaseIdString;
-  email: string;
-  displayName: string;
-  username: string;
-  photoURL: string;
-  emailVerified: boolean;
-  phoneNumber: string;
-  providerData: UserInfo[];
+  email?: string;
+  displayName?: string;
+  username?: string;
+  photoURL?: string;
+  emailVerified?: boolean;
+  phoneNumber?: string;
+  providerData?: UserInfo[];
   tokens?: string[];
 }
 
@@ -138,10 +138,15 @@ export interface Store extends Editable {
   productGalleries: ProductGallery[];
   productPhotos: ProductPhoto[];
 }
+export interface ProductGalleryUser extends Editable{
+  role:'owner'|'editor'|'manger'|'readonly',
+  userInfo: Omit<AppUser, keyof Editable>
+} 
 export interface ProductGallery extends Editable, StoreDoc {
   name: string;
   storeId: FirebaseIdString;
   products: Product[];
+  users: ProductGalleryUser[]
 }
 
 export interface ProductPhoto extends Editable, StoreDoc {

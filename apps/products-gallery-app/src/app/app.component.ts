@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { RouterLinkActive, RouterLink } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { RouterLinkActive, RouterLink, Router } from '@angular/router';
 import { NgFor } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { FirebaseUserService } from './authServices/firebase-user.service';
 @Component({
     selector: 'store-app-repository-root',
     templateUrl: 'app.component.html',
@@ -14,7 +15,9 @@ import { IonicModule } from '@ionic/angular';
         RouterLink,
     ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  fbUserService = inject(FirebaseUserService)
+  router = inject(Router);
   public appPages = [
     { title: 'Inbox', url: '/folder/inbox', icon: 'mail' },
     { title: 'Outbox', url: '/folder/outbox', icon: 'paper-plane' },
@@ -25,4 +28,14 @@ export class AppComponent {
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
   constructor() {}
+  ngOnInit(): void {
+    this.fbUserService.currentAuthStatus.subscribe((user=>{
+      if (user) {
+        this.router.navigate(['']);
+      } else {
+        this.router.navigate(['login']);
+        
+      }
+    }))
+  }
 }

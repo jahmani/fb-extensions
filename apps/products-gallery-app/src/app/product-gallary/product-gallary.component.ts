@@ -1,14 +1,13 @@
 import { AfterViewInit, Component, ViewChild, ViewChildren, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Auth, signOut } from '@angular/fire/auth';
 import { Product } from '@store-app-repository/app-models';
 import {
   Observable,
-  combineLatest,
   combineLatestWith,
   firstValueFrom,
   map,
   of,
-  scan,
   startWith,
   switchMap,
   tap,
@@ -27,6 +26,7 @@ import { ImgIdtoThumbUrePipe } from '../ui-components/img-idto-thumb-ure.pipe';
 import { StoreCustomPropertiesService } from '../dataServices/store-custom-properties.service';
 import { orderBy } from 'firebase/firestore';
 import { HydratedImgDirective } from '../ui-components/hydrated-img.directive';
+import { FirebaseUserService } from '../authServices/firebase-user.service';
 
 @Component({
   selector: 'store-app-repository-product-gallary',
@@ -68,6 +68,8 @@ export class ProductGallaryComponent implements AfterViewInit {
   suggestions: Observable<string[]> | undefined;
   selectedWord$: Observable<string> | undefined;
   environment = inject(environmentToken);
+  fbAuth = inject(Auth)
+  user = inject(FirebaseUserService).user
   productTags$: Observable<string[]>;
   selectedTags$: Observable<string[]> | undefined;
   productBatchsOptionValues$: Observable<string[]>;
@@ -261,5 +263,8 @@ export class ProductGallaryComponent implements AfterViewInit {
   }
   trackBy(index: number, name: Product): string {
     return name.id;
+  }
+  logout(){
+    signOut(this.fbAuth)
   }
 }

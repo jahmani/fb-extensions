@@ -47,6 +47,11 @@ cdk-virtual-scroll-viewport {
   width: 100%;
 }
 
+.small-thumb{
+  --size: 32px;
+  display:inline-block;
+}
+
 @media screen and (min-width: 768px) {
   .image-tall {
     grid-row: span 2 / auto;

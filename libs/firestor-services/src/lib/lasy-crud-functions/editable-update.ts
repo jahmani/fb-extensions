@@ -13,17 +13,17 @@ export async function appEditableDocUpdate<T extends Editable>(
   value: T
 ) {
   const id = value.id;
-  // if (auth && auth.currentUser) {
-  //   const user = await auth.currentUser;
-  //   const uId = user.uid;
+  if (auth && auth.currentUser) {
+    const user = await auth.currentUser;
+    const uId = user.uid;
     const editable: Partial<Editable> = {
       id,
       lastEditedOn: serverTimestamp() as Timestamp,
-      lastEditedByUserId: 'uId',
+      lastEditedByUserId: uId,
     };
     const { withIdUpdate } = await import('./with-id-update');
     return withIdUpdate(collectionRef, Object.assign({}, value, editable));
-  // } else {
-  //   throw new Error('auth parameter is required');
-  // }
+  } else {
+    throw new Error('auth parameter is required');
+  }
 }

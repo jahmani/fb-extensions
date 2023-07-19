@@ -14,18 +14,18 @@ export async function appEditableDocCreate<T extends Editable>(
   value: T,
   id?: string
 ) {
-  // // // // if (auth && auth.currentUser) {
+  if (auth && auth.currentUser) {
     if (!id) {
       const newDocRef = doc(await collectionRef);
       id = newDocRef.id;
     }
-    // // // // const user = await auth.currentUser;
-    // // // // const uId = user.uid;
+    const user = await auth.currentUser;
+    const uId = user.uid;
     const editable: Editable = {
       firstCreatedOn: serverTimestamp() as Timestamp,
       id,
       lastEditedOn: serverTimestamp() as Timestamp,
-      lastEditedByUserId: 'uId',
+      lastEditedByUserId: uId,
     };
     // let path = "./with-id-create";
     // path = path.replace('+','-')
@@ -34,6 +34,6 @@ export async function appEditableDocCreate<T extends Editable>(
       /* webpackMode: "lazy" */ './with-id-create'
     );
     return withIdCreate(collectionRef, Object.assign({}, value, editable), id);
-  // // // }
-  // // // throw new Error('auth parameter is required');
+  }
+  throw new Error('auth parameter is required');
 }

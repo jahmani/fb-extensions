@@ -1,10 +1,24 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Products Gallary</ion-title>
+   <ng-container  *ngIf="user|async as userInfo">
+         <ion-thumbnail class="small-thumb"  slot="end"  *ngIf="userInfo && userInfo.photoURL">
+        <ion-img [src]="userInfo.photoURL" />
+      </ion-thumbnail>
+    </ng-container>
+          <ion-title>
+            Products Gallary   </ion-title>
     <ion-buttons slot="start">
       <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
         <ion-icon slot="start" name="create"></ion-icon>
-        new Product
+        جديد
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+
+
+      <ion-button (click)="logout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+                
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

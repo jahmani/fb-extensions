@@ -1,6 +1,9 @@
-import { Route } from '@angular/router';
+import { Route, Router, UrlTree } from '@angular/router';
 import { InjectionToken, inject } from '@angular/core';
 import { ActivatedRoute, } from '@angular/router';
+import {AuthGuard, redirectUnauthorizedTo,} from '@angular/fire/auth-guard'
+import { Auth, getAuth, user } from '@angular/fire/auth';
+import { map } from 'rxjs/operators';
 
 export const storeIdToken = new InjectionToken<string>('store id');
 export const productGalleryIdToken = new InjectionToken<string>('productGalleryIdToken');
@@ -29,6 +32,20 @@ export const appRoutes: Route[] = [
         }
       },
     ],
+    canActivate: [()=>{
+      const auth = inject(Auth);
+      const appUser = user(auth);
+      const router = inject(Router)
+      const res= appUser.pipe(map(u=>{
+        if (u) {
+          return true;
+        }else{
+          return router.createUrlTree(['login'])
+        }
+      }))
+      return res;
+
+    }], data: { authGuardPipe: redirectUnauthorizedTo(['login']) },
     children: [
       {
         path: 'edit-product/:productId',
@@ -46,7 +63,15 @@ export const appRoutes: Route[] = [
             (m) => m.ProductGallaryComponent
           ),
       },
+
     ],
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./Login/login.component').then(
+        (m) => m.LoginComponent
+      ),
   },
 ];
 
