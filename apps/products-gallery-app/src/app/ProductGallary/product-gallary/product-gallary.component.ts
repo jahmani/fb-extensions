@@ -14,19 +14,19 @@ import {
 } from 'rxjs';
 import { InfiniteScrollCustomEvent, IonInfiniteScroll, IonicModule } from '@ionic/angular';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { ProductsDataService } from '../dataServices/products-data.service';
-import { TagsInputComponent } from '../ui-components/TagsInput/tags-input.component';
-import { WordSuggestionsDataService } from '../dataServices/word-suggestions-data.service';
+import { ProductsDataService } from '../../dataServices/products-data.service';
+import { TagsInputComponent } from '../../ui-components/TagsInput/tags-input.component';
+import { WordSuggestionsDataService } from '../../dataServices/word-suggestions-data.service';
 import { environmentToken } from '@store-app-repository/firestor-services';
 import { QueryConstraint, where } from '@angular/fire/firestore';
-import { GallaryHelperDocsDataService } from '../dataServices/gallary-helper-docs-data.service';
+import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
 import { RouterLink } from '@angular/router';
-import { storeIdToken } from '../app.routes';
-import { ImgIdtoThumbUrePipe } from '../ui-components/img-idto-thumb-ure.pipe';
-import { StoreCustomPropertiesService } from '../dataServices/store-custom-properties.service';
+import { storeIdToken } from '../../app.routes';
+import { ImgIdtoThumbUrePipe } from '../../ui-components/img-idto-thumb-ure.pipe';
+import { StoreCustomPropertiesService } from '../../dataServices/store-custom-properties.service';
 import { orderBy } from 'firebase/firestore';
-import { HydratedImgDirective } from '../ui-components/hydrated-img.directive';
-import { FirebaseUserService } from '../authServices/firebase-user.service';
+import { HydratedImgDirective } from '../../ui-components/hydrated-img.directive';
+import { FirebaseUserService } from '../../authServices/firebase-user.service';
 
 @Component({
   selector: 'store-app-repository-product-gallary',

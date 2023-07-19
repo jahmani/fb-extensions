@@ -28,7 +28,7 @@ import {
 import { UploadTaskComponent } from '../UploadTask/upload-task.component';
 import { SharedFilesService } from '../../services/shared-files.service';
 import { CommonModule } from '@angular/common';
-import { FileIdGetterToken } from '../../Products/edit-product/edit-product.page';
+import { FileIdGetterToken } from '../../ProductGallary/edit-product/edit-product.page';
 import { ImgIdtoThumbUrePipe } from '../img-idto-thumb-ure.pipe';
 import { ThumbObjToImgIdsPipe } from '../thumb-obj-to-img-ids.pipe';
 

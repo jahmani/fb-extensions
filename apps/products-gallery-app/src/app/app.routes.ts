@@ -52,14 +52,14 @@ export const appRoutes: Route[] = [
         canDeactivate:[(component: any) =>  component.canDeactivate? component.canDeactivate() : true],
         
         loadComponent: () =>
-          import('./Products/edit-product/edit-product.page').then(
+          import('./ProductGallary/edit-product/edit-product.page').then(
             (m) => m.EditProductPageComponent
           ),
       },
       {
         path: 'products',
         loadComponent: () =>
-          import('./product-gallary/product-gallary.component').then(
+          import('./ProductGallary/product-gallary/product-gallary.component').then(
             (m) => m.ProductGallaryComponent
           ),
       },
