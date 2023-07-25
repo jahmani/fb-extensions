@@ -97,7 +97,7 @@ export interface WordSuggestion extends Editable, Extendable, ProductGalleryDoc 
 export interface ProductDocTags{
   [tagWord: string]: boolean
 }
-export interface Product extends Editable, Extendable, ProductGalleryDoc {
+export interface Product extends Editable, ProductGalleryDoc {
   name: string;
   namePrefexes: string[];
   nameParts: {[partNumber:string]:string};
@@ -121,7 +121,7 @@ export interface Product extends Editable, Extendable, ProductGalleryDoc {
   customProperties: { [cpName: string]: string | number | null };
 }
 
-export interface AppUser extends Editable {
+export interface RawAppUser  {
   uid: FirebaseIdString;
   email?: string;
   displayName?: string;
@@ -132,6 +132,9 @@ export interface AppUser extends Editable {
   providerData?: UserInfo[];
   tokens?: string[];
 }
+export interface AppUser extends RawAppUser, Editable{
+
+}
 
 export interface Store extends Editable {
   name: string;
@@ -140,7 +143,7 @@ export interface Store extends Editable {
 }
 export interface ProductGalleryUser extends Editable{
   role:'owner'|'editor'|'manger'|'readonly',
-  userInfo: Omit<AppUser, keyof Editable>
+  userInfo:  RawAppUser
 } 
 export interface ProductGallery extends Editable, StoreDoc {
   name: string;

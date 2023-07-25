@@ -5,14 +5,14 @@ import { Environment } from "../lasy-firestore-provider-service";
 export async function withIdUpdate<T extends WithId>(collectionRefP: Promise<CollectionReference>, value: Partial<T>, environment?: Environment) {
     const collectionRef = await collectionRefP;
     const updatedDocRef = doc(collectionRef, value.id)
-    const id = value.id;
-    const withId = {
-        //      firstCreatedOn: FieldValue.serverTimestamp(),
-        id,
-    };
+    // const id = value.id;
+    // const withId = {
+    //     //      firstCreatedOn: FieldValue.serverTimestamp(),
+    //     id,
+    // };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {ext, ...trimmed} = value;
-    const updated =  Object.assign({}, trimmed, withId) ;
+    const {ext, id, ...trimmed} = value;
+    const updated =  Object.assign({}, trimmed) ;
 
     return updateDoc(updatedDocRef, updated).then(()=> {
         if (environment && !environment.production) {

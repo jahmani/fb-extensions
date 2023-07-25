@@ -25,13 +25,13 @@ export class ProductsDataService extends EditableFirestoreService<Product> {
   toFirestore2(product: PartialWithFieldValue<Product>): DocumentData {
     console.log('product: ', product);
     const res = super.toFirestore(product);
-    const tagsArray = (product as Product).tags;
-    if (tagsArray) {
-      const tagsObj = tagsArrayToTagsObj(tagsArray);
-      if (tagsObj) {
-        res['tags'] = tagsObj;
-      }     
-    }
+    // const tagsArray = (product as Product).tags;
+    // if (tagsArray ) {
+    //   const tagsObj = tagsArrayToTagsObj(tagsArray);
+    //   if (tagsObj) {
+    //     res['tags'] = tagsObj;
+    //   }     
+    // }
     return res;
   }
 
@@ -52,7 +52,7 @@ export class ProductsDataService extends EditableFirestoreService<Product> {
     fromFirestore: this.fromFirestore,
   };
 
-  override update(value: Product): Promise<void> {
+  override update(value: Omit<Product, 'id'|'firstCreatedOn'>): Promise<void> {
       const res = this.toFirestore2(value) as Product;
       return super.update(res);
   }

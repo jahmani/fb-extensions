@@ -1,19 +1,71 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2023, 7, 28);
+    function getUserRole(storeId, galleryId) {
+        return get(/databases/$(database)/documents/stores/$(storeId)/galleries/$(galleryId)/gallaryUsers/$(request.auth.uid)).data.role;
+        
+    }
+
+    function isOneOfRoles(storeId, galleryId, roles) {
+        return roles.hasAny([getUserRole(storeId, galleryId)]);
+    }
+
+    // Rules for stores collection
+    match /stores/{storeId} {
+      function getStoreUser() {
+        return  exists(/databases/$(database)/documents/stores/$(storeId)/storeUsers/$(request.auth.uid));
+      }
+
+      allow read, create: if getStoreUser();
+      allow update, delete: if false; // Disabling update and delete operations. Update this according to your needs.
+
+      match /{anyDoc=**} {
+        allow read: if getStoreUser();
+        allow write: if  false; // Disabling write operations. Update this according to your needs.
+      }
+
+      // Rules for galleries collection and its subcollections
+      match /galleries/{galleryId} {
+
+        // function getProductGallaryUser() {
+        //   return  get(/databases/$(database)/documents/stores/$(storeId)/galleries/{galleryId}/gallaryUsers/$(request.auth.uid)).data != null;
+        // }
+
+        match /gallaryUsers/{userId} {
+          allow read, write: if isOneOfRoles(storeId, galleryId, ['owner', 'manager']);
+          allow create: if isOneOfRoles(storeId, galleryId, ['owner', 'manager']) && 
+                          request.resource.data.keys().hasOnly(['role', 'userInfo']) &&
+                          request.resource.data.role in ['manager', 'readonly', 'editor'];
+          allow update: if isOneOfRoles(storeId, galleryId, ['owner', 'manager']) && 
+                          request.resource.data.keys().hasOnly(['role']) && 
+                          request.resource.data.role in ['manager', 'readonly', 'editor'];
+        }
+
+match /products/{productId} {
+  function isProductDataValid(isCreate) {
+  return request.resource.data.id == productId &&
+    request.resource.data.storeId == storeId &&
+    request.resource.data.productGalleryId == galleryId &&
+    request.resource.data.lastEditedOn == request.time &&
+    request.resource.data.lastEditedByUserId == request.auth.uid &&
+    request.resource.data.name != null &&  request.resource.data.name is string && 
+    request.resource.data.keys().hasOnly(['id', 'storeId', 'productGalleryId', 'firstCreatedOn', 'lastEditedOn', 'lastEditedByUserId', 'name', 'namePrefexes', 'modelNos', 'price', 'brand', 'costPrice', 'note', 'sizes', 'colors', 'origin', 'imageIds', 'thumbProperties', 'tags', 'balance', 'variants', 'customProperties']) &&
+    (isCreate ? request.resource.data.firstCreatedOn == request.time : resource.data.firstCreatedOn == request.resource.data.firstCreatedOn);
+}
+  allow read: if getUserRole(storeId, galleryId) !=null;
+  allow create: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) && isProductDataValid(true);  
+  allow update: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) && isProductDataValid(false);
+  allow delete: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) ;
+}
+
+
+
+        match /{anyDoc=**} {
+          allow read: if getStoreUser();
+          allow write: if false; // Disabling write operations for all other subcollections.
+        }
+      }
     }
   }
 }

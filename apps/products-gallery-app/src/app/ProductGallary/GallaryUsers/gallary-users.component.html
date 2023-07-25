@@ -1,0 +1,26 @@
+<ion-header>
+    <ion-toolbar>
+
+            <ion-title>
+              Gallary  users </ion-title>
+      <ion-buttons slot="start">
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list-header>
+        <ion-label>users</ion-label>
+        <ion-button (click)="addCurrentUser()">See All</ion-button>
+    </ion-list-header>
+    <ion-list *ngIf="users$|async as users">
+        <ion-item *ngFor="let user of users">
+            <ion-avatar *ngIf="user.userInfo && user.userInfo.photoURL"  slot="start">
+                <img [src]="user.userInfo.photoURL" />
+            </ion-avatar>
+            <ion-label>{{user.userInfo.displayName}}</ion-label>
+        </ion-item>
+    </ion-list>
+    </ion-content>

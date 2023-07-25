@@ -26,7 +26,7 @@ import { WordSuggestionsDataService } from '../../dataServices/word-suggestions-
 import { TagsInputComponent } from '../../ui-components/TagsInput/tags-input.component';
 import { Observable, Subject, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
-import { storeIdToken } from '../../app.routes';
+import { productGalleryIdToken, storeIdToken } from '../../app.routes';
 import { FormPhotoControlComponent } from '../../ui-components/FormPhotoControl/form-photo-control.component';
 import { TransformCtrlValueByDirective } from '../../ui-components/transform-ctrl-value-by.directive';
 import { StoreCustomPropertiesService } from '../../dataServices/store-custom-properties.service';
@@ -115,8 +115,8 @@ export class EditProductPageComponent implements AfterViewInit {
   
 
   @Output() saveProduct: EventEmitter<Product> = new EventEmitter<Product>();
-  injectedStoreId = inject(storeIdToken);
-  storeId = this.injectedStoreId; // "tHP7s3ysRD4IU45Z0j8N"
+  storeId = inject(storeIdToken);
+  gallaryId = inject(productGalleryIdToken); // "tHP7s3ysRD4IU45Z0j8N"
   private productsService = inject(ProductsDataService);
   private gallaryHelperDocsDataService = inject(GallaryHelperDocsDataService);
   private location = inject(Location)
@@ -154,14 +154,14 @@ export class EditProductPageComponent implements AfterViewInit {
       price: new FormControl(undefined, {nonNullable:true, validators:[Validators.required]}),
       brand: new FormControl('', {nonNullable:true}),
       costPrice: new FormControl(undefined, {nonNullable:true}),
-      notice: new FormControl(undefined, {nonNullable:true}),
-      modelNo: new FormControl(undefined, {nonNullable:true}),
-      size: new FormControl(undefined, {nonNullable:true}),
-      color: new FormControl(undefined, {nonNullable:true}),
-      images: new FormControl(undefined, {nonNullable:true}),
+      note: new FormControl(undefined, {nonNullable:true}),
+      modelNos: new FormControl(undefined, {nonNullable:true}),
+      sizes: new FormControl(undefined, {nonNullable:true}),
+      colors: new FormControl(undefined, {nonNullable:true}),
+      // images: new FormControl(undefined, {nonNullable:true}),
       imageIds: new FormControl(undefined, {nonNullable:true}),
       thumbProperties: new FormControl(undefined, {nonNullable:true}),
-      tags: new FormControl(undefined, {nonNullable:true}),
+      // tags: new FormControl(undefined, {nonNullable:true}),
       balance: new FormControl(undefined, {nonNullable:true}),
       origin: new FormControl(undefined, {nonNullable:true}),
       customProperties: new FormGroup({
@@ -308,6 +308,8 @@ export class EditProductPageComponent implements AfterViewInit {
     // const productDocRef = doc(productsCollection);
     // const productPath = doc(productsCollection).path;
 
+    product.storeId = this.storeId;
+    product.productGalleryId = this.gallaryId
 if (product.thumbProperties) {
       const imgIds = Object.keys(product.thumbProperties);
       product.imageIds = imgIds;
@@ -330,14 +332,23 @@ const nameWords = product.name.split(' ') || [];
     product.tags = product.tags || [];
     const namePrefexes = this.getNamePrefexes(nameWords);
     product.namePrefexes = namePrefexes;
-    const nameParts = product.name.split(' ') || [];
+    // const nameParts = product.name.split(' ') || [];
 
-    const namePArtsObj = Object.assign<{[partNo:string]: string},string[]>({},nameParts)
-    product.nameParts= namePArtsObj;
+    // const namePArtsObj = Object.assign<{[partNo:string]: string},string[]>({},nameParts)
+    // product.nameParts= namePArtsObj;
 
 
-    const prom =this.addNew ? this.productsService.create(product) : this.productsService.update(product);
-      // setDoc(productDocRef,product)
+    let prom 
+    if (this.addNew ) {
+      prom = this.productsService.create(product)
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // const {firstCreatedOn, id, ...updateProd} = {... product};
+      prom = this.productsService.update(product)
+
+    }
+
+    // setDoc(productDocRef,product)
      return prom.then(() => {
         console.log('Product saved successfully.');
         this.productForm.reset();

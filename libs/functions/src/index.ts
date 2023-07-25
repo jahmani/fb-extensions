@@ -15,7 +15,7 @@ admin.initializeApp();
 
 export {createImageDocument} from "./onImageFileFinalize"
 export {updateImageReferences} from "./onProductWrite"
-
+export {onNewGallaryUser} from "./onNewGallaryUser"
 export {updateWordSuggestions} from "./updateWordSuggestions"
 
 // export const helloWorld = onRequest((request, response) => {

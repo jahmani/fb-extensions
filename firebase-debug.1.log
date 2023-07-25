@@ -1,0 +1,198 @@
+[debug] [2023-07-25T07:51:35.950Z] ----------------------------------------------------------------------
+[debug] [2023-07-25T07:51:35.952Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2023-07-25T07:51:35.953Z] CLI Version:   12.2.1
+[debug] [2023-07-25T07:51:35.953Z] Platform:      win32
+[debug] [2023-07-25T07:51:35.953Z] Node Version:  v18.16.0
+[debug] [2023-07-25T07:51:35.955Z] Time:          Tue Jul 25 2023 10:51:35 GMT+0300 (GMT+03:00)
+[debug] [2023-07-25T07:51:35.955Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-25T07:51:35.959Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2023-07-25T07:51:36.149Z] Object ".extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2023-07-25T07:51:36.168Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-25T07:51:36.169Z] > authorizing via signed-in user (jahmani@gmail.com)
+[debug] [2023-07-25T07:51:36.170Z] [iam] checking project store-gallary for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-25T07:51:36.175Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T07:51:36.179Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T07:51:36.179Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T07:51:37.316Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2023-07-25T07:51:37.317Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2023-07-25T07:51:57.251Z] [iam] error while checking permissions, command may fail: FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T07:51:57.254Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T07:51:57.256Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T07:51:57.256Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T07:52:00.328Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T07:52:00.336Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:144:12)
+    at refreshTokens (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:508:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Client.getAccessToken (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:149:23)
+    at async Client.addAuthHeader (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:140:21)
+    at async Client.request (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:96:34)
+    at async getFirebaseProject (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:295:21)
+    at async getDefaultHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\getDefaultHostingSite.js:10:21)
+    at async requireHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\requireHostingSite.js:9:18)
+    at async Object.fn (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\commands\deploy.js:74:9)
+[error] 
+[error] Error: Failed to get Firebase project store-gallary. Please make sure the project exists and your account has permission to access it.
+[debug] [2023-07-25T16:47:30.655Z] ----------------------------------------------------------------------
+[debug] [2023-07-25T16:47:30.659Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2023-07-25T16:47:30.660Z] CLI Version:   12.2.1
+[debug] [2023-07-25T16:47:30.661Z] Platform:      win32
+[debug] [2023-07-25T16:47:30.661Z] Node Version:  v18.16.0
+[debug] [2023-07-25T16:47:30.663Z] Time:          Tue Jul 25 2023 19:47:30 GMT+0300 (GMT+03:00)
+[debug] [2023-07-25T16:47:30.663Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-25T16:47:30.755Z] Object ".extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2023-07-25T16:47:30.760Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-25T16:47:30.760Z] > authorizing via signed-in user (jahmani@gmail.com)
+[debug] [2023-07-25T16:47:30.760Z] [iam] checking project store-gallary for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-25T16:47:30.762Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T16:47:30.764Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T16:47:30.764Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T16:47:51.860Z] [iam] error while checking permissions, command may fail: FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T16:47:51.863Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T16:47:51.865Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T16:47:51.865Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T16:48:12.940Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T16:48:12.950Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:144:12)
+    at refreshTokens (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:508:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Client.getAccessToken (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:149:23)
+    at async Client.addAuthHeader (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:140:21)
+    at async Client.request (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:96:34)
+    at async getFirebaseProject (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:295:21)
+    at async getDefaultHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\getDefaultHostingSite.js:10:21)
+    at async requireHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\requireHostingSite.js:9:18)
+    at async Object.fn (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\commands\deploy.js:74:9)
+[error] 
+[error] Error: Failed to get Firebase project store-gallary. Please make sure the project exists and your account has permission to access it.
+[debug] [2023-07-25T17:09:59.057Z] ----------------------------------------------------------------------
+[debug] [2023-07-25T17:09:59.059Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2023-07-25T17:09:59.059Z] CLI Version:   12.2.1
+[debug] [2023-07-25T17:09:59.060Z] Platform:      win32
+[debug] [2023-07-25T17:09:59.060Z] Node Version:  v18.16.0
+[debug] [2023-07-25T17:09:59.061Z] Time:          Tue Jul 25 2023 20:09:59 GMT+0300 (GMT+03:00)
+[debug] [2023-07-25T17:09:59.061Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-25T17:09:59.135Z] Object ".extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2023-07-25T17:09:59.139Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-25T17:09:59.140Z] > authorizing via signed-in user (jahmani@gmail.com)
+[debug] [2023-07-25T17:09:59.140Z] [iam] checking project store-gallary for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-25T17:09:59.142Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T17:09:59.143Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T17:09:59.143Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T17:10:20.277Z] [iam] error while checking permissions, command may fail: FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T17:10:20.281Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T17:10:20.283Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T17:10:20.284Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T17:10:41.349Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T17:10:41.358Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:144:12)
+    at refreshTokens (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:508:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Client.getAccessToken (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:149:23)
+    at async Client.addAuthHeader (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:140:21)
+    at async Client.request (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:96:34)
+    at async getFirebaseProject (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:295:21)
+    at async getDefaultHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\getDefaultHostingSite.js:10:21)
+    at async requireHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\requireHostingSite.js:9:18)
+    at async Object.fn (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\commands\deploy.js:74:9)
+[error] 
+[error] Error: Failed to get Firebase project store-gallary. Please make sure the project exists and your account has permission to access it.
+[debug] [2023-07-25T17:33:02.659Z] ----------------------------------------------------------------------
+[debug] [2023-07-25T17:33:02.661Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2023-07-25T17:33:02.662Z] CLI Version:   12.2.1
+[debug] [2023-07-25T17:33:02.662Z] Platform:      win32
+[debug] [2023-07-25T17:33:02.663Z] Node Version:  v18.16.0
+[debug] [2023-07-25T17:33:02.664Z] Time:          Tue Jul 25 2023 20:33:02 GMT+0300 (GMT+03:00)
+[debug] [2023-07-25T17:33:02.665Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-25T17:33:02.739Z] Object ".extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2023-07-25T17:33:02.744Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-25T17:33:02.744Z] > authorizing via signed-in user (jahmani@gmail.com)
+[debug] [2023-07-25T17:33:02.745Z] [iam] checking project store-gallary for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-25T17:33:02.746Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T17:33:02.748Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T17:33:02.748Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T17:33:23.864Z] [iam] error while checking permissions, command may fail: FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T17:33:23.868Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T17:33:23.869Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T17:33:23.870Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T17:33:44.946Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T17:33:44.952Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:144:12)
+    at refreshTokens (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:508:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Client.getAccessToken (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:149:23)
+    at async Client.addAuthHeader (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:140:21)
+    at async Client.request (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:96:34)
+    at async getFirebaseProject (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:295:21)
+    at async getDefaultHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\getDefaultHostingSite.js:10:21)
+    at async requireHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\requireHostingSite.js:9:18)
+    at async Object.fn (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\commands\deploy.js:74:9)
+[error] 
+[error] Error: Failed to get Firebase project store-gallary. Please make sure the project exists and your account has permission to access it.
+[debug] [2023-07-25T17:35:52.972Z] ----------------------------------------------------------------------
+[debug] [2023-07-25T17:35:52.977Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2023-07-25T17:35:52.978Z] CLI Version:   12.2.1
+[debug] [2023-07-25T17:35:52.979Z] Platform:      win32
+[debug] [2023-07-25T17:35:52.979Z] Node Version:  v18.16.0
+[debug] [2023-07-25T17:35:52.981Z] Time:          Tue Jul 25 2023 20:35:52 GMT+0300 (GMT+03:00)
+[debug] [2023-07-25T17:35:52.981Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-25T17:35:53.162Z] Object ".extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2023-07-25T17:35:53.172Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-25T17:35:53.173Z] > authorizing via signed-in user (jahmani@gmail.com)
+[debug] [2023-07-25T17:35:53.174Z] [iam] checking project store-gallary for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-07-25T17:35:53.180Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T17:35:53.188Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T17:35:53.188Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T17:36:14.419Z] [iam] error while checking permissions, command may fail: FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T17:36:14.423Z] > refreshing access token with scopes: []
+[debug] [2023-07-25T17:36:14.425Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-07-25T17:36:14.425Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-07-25T17:36:35.496Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-07-25T17:36:35.506Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:144:12)
+    at refreshTokens (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\auth.js:508:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Client.getAccessToken (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:149:23)
+    at async Client.addAuthHeader (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:140:21)
+    at async Client.request (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:96:34)
+    at async getFirebaseProject (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\management\projects.js:295:21)
+    at async getDefaultHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\getDefaultHostingSite.js:10:21)
+    at async requireHostingSite (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\requireHostingSite.js:9:18)
+    at async Object.fn (C:\Users\jahmani\AppData\Roaming\npm\node_modules\firebase-tools\lib\commands\deploy.js:74:9)
+[error] 
+[error] Error: Failed to get Firebase project store-gallary. Please make sure the project exists and your account has permission to access it.

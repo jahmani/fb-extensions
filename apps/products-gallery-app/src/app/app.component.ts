@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   fbUserService = inject(FirebaseUserService)
   router = inject(Router);
   public appPages = [
-    { title: 'Inbox', url: '/folder/inbox', icon: 'mail' },
+    { title: 'users', url: 'users', icon: 'people' },
     { title: 'Outbox', url: '/folder/outbox', icon: 'paper-plane' },
     { title: 'Favorites', url: '/folder/favorites', icon: 'heart' },
     { title: 'Archived', url: '/folder/archived', icon: 'archive' },
@@ -29,13 +29,10 @@ export class AppComponent implements OnInit {
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
   constructor() {}
   ngOnInit(): void {
-    this.fbUserService.currentAuthStatus.subscribe((user=>{
-      if (user) {
-        this.router.navigate(['']);
-      } else {
-        this.router.navigate(['login']);
-        
-      }
-    }))
+    // this.fbUserService.currentAuthStatus.subscribe((user=>{
+    //   if (!user) {
+    //     this.router.navigate(['login']);
+    //   }
+    // }))
   }
 }

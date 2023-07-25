@@ -34,7 +34,7 @@
     <ion-item>
       <ion-input label="Price" type="number" formControlName="price"></ion-input>
     </ion-item>
-    <store-app-repository-tags-input type="array" formControlName="modelNo"  [maxTags]="10"
+    <store-app-repository-tags-input type="array" formControlName="modelNos"  [maxTags]="10"
     label="ModelNo"></store-app-repository-tags-input>
     <store-app-repository-form-photo-control  formControlName="thumbProperties"></store-app-repository-form-photo-control>
 
@@ -47,7 +47,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-input label="Notice" formControlName="notice"></ion-input>
+      <ion-input label="Notice" formControlName="note"></ion-input>
     </ion-item>
 
     <!-- <ion-item>
@@ -55,11 +55,11 @@
     </ion-item> -->
 
     <ion-item>
-      <ion-input label="Size" formControlName="size"></ion-input>
+      <ion-input label="Size" formControlName="sizes"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-input label="Color" formControlName="color"></ion-input>
+      <ion-input label="Color" formControlName="colors"></ion-input>
     </ion-item>
 
     <!-- <ion-item>
@@ -93,7 +93,7 @@
       <ion-input label="Origin" formControlName="origin"></ion-input>
     </ion-item>
     <ion-button type="submit">Save</ion-button>
-    <ion-button *ngIf="!addNew" (click)="deleteProduct(productForm.value.id)" type="submit">delete</ion-button>
+    <ion-button *ngIf="!addNew" (click)="deleteProduct(productForm.value.id)" >delete</ion-button>
 
   </form>
 

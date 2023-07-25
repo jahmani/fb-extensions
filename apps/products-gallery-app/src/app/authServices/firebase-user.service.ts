@@ -14,7 +14,7 @@ export class FirebaseUserService {
     onAuthStateChanged(this.fbAuth,(u)=>this.authStatusSub.next(u))
    }
   getCurrentUser(){
-    this.fbAuth.currentUser;
+    return this.fbAuth.currentUser;
 
   }
 }

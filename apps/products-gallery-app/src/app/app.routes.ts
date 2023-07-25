@@ -31,6 +31,10 @@ export const appRoutes: Route[] = [
       
         }
       },
+      {
+        provide: productGalleryIdToken,
+        useValue: 'default'
+      }
     ],
     canActivate: [()=>{
       const auth = inject(Auth);
@@ -61,6 +65,13 @@ export const appRoutes: Route[] = [
         loadComponent: () =>
           import('./ProductGallary/product-gallary/product-gallary.component').then(
             (m) => m.ProductGallaryComponent
+          ),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./ProductGallary/GallaryUsers/gallary-users.component').then(
+            (m) => m.GallaryUsersComponent
           ),
       },
 

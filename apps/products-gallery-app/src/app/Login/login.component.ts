@@ -12,6 +12,7 @@ import {
 import { AppUserInfoService } from '../dataServices/app-user-info.service';
 import { take } from 'rxjs';
 import { AppUser } from '@store-app-repository/app-models';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'store-app-repository-login',
@@ -23,6 +24,7 @@ import { AppUser } from '@store-app-repository/app-models';
 export class LoginComponent implements OnInit {
   auth = inject(Auth);
   appUserInfoService = inject(AppUserInfoService);
+  router = inject(Router)
   googleLogIn() {
     const provider = new GoogleAuthProvider();
     signInWithPopup(this.auth, provider)
@@ -56,6 +58,7 @@ export class LoginComponent implements OnInit {
               this.appUserInfoService.create(userDTO, user.uid);
             }
           });
+          return this.router.navigate(['']);
         console.log(user, token);
         // ...
       })
