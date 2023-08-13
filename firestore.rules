@@ -50,7 +50,11 @@ match /products/{productId} {
     request.resource.data.lastEditedOn == request.time &&
     request.resource.data.lastEditedByUserId == request.auth.uid &&
     request.resource.data.name != null &&  request.resource.data.name is string && 
-    request.resource.data.keys().hasOnly(['id', 'storeId', 'productGalleryId', 'firstCreatedOn', 'lastEditedOn', 'lastEditedByUserId', 'name', 'namePrefexes', 'modelNos', 'price', 'brand', 'costPrice', 'note', 'sizes', 'colors', 'origin', 'imageIds', 'thumbProperties', 'tags', 'balance', 'variants', 'customProperties']) &&
+    request.resource.data.keys().hasOnly(['id', 'storeId', 'productGalleryId', 'firstCreatedOn', 
+    'lastEditedOn', 'lastEditedByUserId', 'name',
+     'namePrefexes', 'modelNos', 'price', 'brand', 'costPrice', 'note', 'sizes', 'colors', 'origin',
+      'imageIds', 'thumbProperties', 'tags',
+      'balance', 'variants', 'customProperties']) &&
     (isCreate ? request.resource.data.firstCreatedOn == request.time : resource.data.firstCreatedOn == request.resource.data.firstCreatedOn);
 }
   allow read: if getUserRole(storeId, galleryId) !=null;

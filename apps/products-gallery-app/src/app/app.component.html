@@ -1,4 +1,19 @@
-<ion-app>
+<ion-app *ngIf="{isOnline:isOnline$|async } as vm">
+  <div  class="initial" [ngClass]="{offline: !vm.isOnline, online: vm.isOnline, initial:vm.isOnline }" >
+    <div class="ion-no-padding">
+      <ion-icon slot="icon-only" src="../assets//icons/cloud-offline-outline.svg"></ion-icon>
+      <span> وضع عدم ألأتصال </span>
+      <span *ngIf="showMoreOfflinePrompt" >, قد تكون بعض البيانات غير مكتملة لحين عودة ألأنترنت</span>
+      <span>...  <a color="primary" (click)="showMoreOfflinePrompt = !showMoreOfflinePrompt">
+        <span>
+          {{!showMoreOfflinePrompt 
+       ? "عرض المزبد"
+       : "عرض اقل"
+          }}
+      </span>
+      </a></span>
+    </div>
+    </div>
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content" type="overlay">
       <ion-content>

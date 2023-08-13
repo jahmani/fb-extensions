@@ -1,7 +1,6 @@
 import { importProvidersFrom, inject, isDevMode } from '@angular/core';
 import { AppComponent } from './app/app.component';
-import { connectStorageEmulator } from 'firebase/storage';
-import { provideStorage, getStorage } from '@angular/fire/storage';
+import { provideStorage, getStorage, connectStorageEmulator } from '@angular/fire/storage';
 import {
   provideFunctions,
   getFunctions,
@@ -20,7 +19,7 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { IonicModule } from '@ionic/angular';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { environmentToken } from '@store-app-repository/firestor-services';
+import { disableNetworkPeriodToken, environmentToken } from '@store-app-repository/firestor-services';
 import { appRoutes } from './app/app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
 
@@ -34,12 +33,16 @@ bootstrapApplication(AppComponent, {
         useEmulator: environment.useEmulators,
       },
     },
+    {
+      provide: disableNetworkPeriodToken,
+      useValue: 0
+    },
     provideRouter(appRoutes, withComponentInputBinding()),
     importProvidersFrom(
       BrowserModule,
       IonicModule.forRoot({ bindToComponentInputs: true }),
       // AppRoutingModule,
-      provideFirebaseApp(() => initializeApp(environment.firebase)),
+      provideFirebaseApp(() => initializeApp(environment.firebase,)),
       provideAuth(() => {
         const auth = getAuth();
         if (inject(environmentToken).useEmulator) {
@@ -70,10 +73,6 @@ bootstrapApplication(AppComponent, {
         return stoarge;
       })
     ),
-    provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000',
-    }),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

@@ -2,6 +2,19 @@ ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
 
+div.offline{
+  /* display: block; */
+  z-index: 1;
+  text-align: center;
+  background-color: #757575;
+  display: block;
+}
+div.online{
+  display: block;
+}
+div.initial{
+  display: none;
+}
 ion-menu.md ion-content {
   --padding-start: 8px;
   --padding-end: 8px;

@@ -21,7 +21,7 @@ export async function appEditableDocUpdate<T extends Editable>(
       lastEditedOn: serverTimestamp() as Timestamp,
       lastEditedByUserId: uId,
     };
-    const {firstCreatedOn, ...objeToUpdate} = { ...value, ...editable} as Omit<Editable, 'firstCreatedOn'> ;
+    const objeToUpdate = { ...value, ...editable} ;//as Omit<Editable, 'firstCreatedOn'> ;
     const { withIdUpdate } = await import('./with-id-update');
     return withIdUpdate(collectionRef,objeToUpdate);
   } else {

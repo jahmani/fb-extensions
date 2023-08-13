@@ -4,10 +4,11 @@ import { ActivatedRoute, } from '@angular/router';
 import {AuthGuard, redirectUnauthorizedTo,} from '@angular/fire/auth-guard'
 import { Auth, getAuth, user } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
+import { FirebaseUserService } from './authServices/firebase-user.service';
 
 export const storeIdToken = new InjectionToken<string>('store id');
 export const productGalleryIdToken = new InjectionToken<string>('productGalleryIdToken');
-
+function componentCanDeactivate (component: any) { component.canDeactivate? component.canDeactivate() : true}
 export const appRoutes: Route[] = [
   {
     path: '',
@@ -37,10 +38,9 @@ export const appRoutes: Route[] = [
       }
     ],
     canActivate: [()=>{
-      const auth = inject(Auth);
-      const appUser = user(auth);
+      const firebaseUserService = inject(FirebaseUserService)
       const router = inject(Router)
-      const res= appUser.pipe(map(u=>{
+      const res= firebaseUserService.fastUser$.pipe(map(u=>{
         if (u) {
           return true;
         }else{
@@ -49,11 +49,12 @@ export const appRoutes: Route[] = [
       }))
       return res;
 
-    }], data: { authGuardPipe: redirectUnauthorizedTo(['login']) },
+    }],
+    data: { authGuardPipe: redirectUnauthorizedTo(['login']) },
     children: [
       {
         path: 'edit-product/:productId',
-        canDeactivate:[(component: any) =>  component.canDeactivate? component.canDeactivate() : true],
+        canDeactivate:[componentCanDeactivate],
         
         loadComponent: () =>
           import('./ProductGallary/edit-product/edit-product.page').then(
@@ -66,6 +67,7 @@ export const appRoutes: Route[] = [
           import('./ProductGallary/product-gallary/product-gallary.component').then(
             (m) => m.ProductGallaryComponent
           ),
+          canDeactivate: [componentCanDeactivate]
       },
       {
         path: 'users',

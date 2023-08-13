@@ -85,6 +85,7 @@ export class EditProductPageComponent implements AfterViewInit {
   addNew =true;
   batchOptions: Observable<string[] | undefined>;
   showLeaveEditWarning= false;
+  productToUpdate: Product | undefined;
 
   // private _productId: string;
   @Input() set productId(value: string){
@@ -105,6 +106,7 @@ export class EditProductPageComponent implements AfterViewInit {
         this.productForm.patchValue({...product, });
         const productNameWords = product.name.split(' ');
         this.tagsInputComponent?.setValue(productNameWords);
+        this.productToUpdate = product;
       } else{
         console.log('product not fount');
       }
@@ -344,7 +346,10 @@ const nameWords = product.name.split(' ') || [];
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       // const {firstCreatedOn, id, ...updateProd} = {... product};
-      prom = this.productsService.update(product)
+if (this.productToUpdate) {
+        product.firstCreatedOn = this.productToUpdate.firstCreatedOn;
+  
+}      prom = this.productsService.update(product)
 
     }
 

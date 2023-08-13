@@ -1,13 +1,15 @@
-import { AfterViewInit, Component, ViewChild, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Auth, signOut } from '@angular/fire/auth';
 import { Product } from '@store-app-repository/app-models';
 import {
   Observable,
   combineLatestWith,
+  distinctUntilChanged,
   firstValueFrom,
   map,
   of,
+  shareReplay,
   startWith,
   switchMap,
   tap,
@@ -17,16 +19,18 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ProductsDataService } from '../../dataServices/products-data.service';
 import { TagsInputComponent } from '../../ui-components/TagsInput/tags-input.component';
 import { WordSuggestionsDataService } from '../../dataServices/word-suggestions-data.service';
-import { environmentToken } from '@store-app-repository/firestor-services';
+import { FirebaseloggerService, environmentToken } from '@store-app-repository/firestor-services';
 import { QueryConstraint, where } from '@angular/fire/firestore';
 import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { storeIdToken } from '../../app.routes';
 import { ImgIdtoThumbUrePipe } from '../../ui-components/img-idto-thumb-ure.pipe';
 import { StoreCustomPropertiesService } from '../../dataServices/store-custom-properties.service';
 import { orderBy } from 'firebase/firestore';
 import { HydratedImgDirective } from '../../ui-components/hydrated-img.directive';
 import { FirebaseUserService } from '../../authServices/firebase-user.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 
 @Component({
   selector: 'store-app-repository-product-gallary',
@@ -39,22 +43,22 @@ import { FirebaseUserService } from '../../authServices/firebase-user.service';
     TagsInputComponent,
     RouterLink,
     ImgIdtoThumbUrePipe,
-    HydratedImgDirective
+    HydratedImgDirective,
+    
   ],
   templateUrl: './product-gallary.component.html',
   styleUrls: ['./product-gallary.component.scss'],
 })
 export class ProductGallaryComponent implements AfterViewInit {
   // private firestore: Firestore = inject(Firestore)
-  @ViewChild('productNameWordsInput') productNameWordsInputComponent:
-    | TagsInputComponent
+  @ViewChildren('productNameWordsInput') productNameWordsInputComponents: QueryList<TagsInputComponent>
     | undefined;
     
     @ViewChild('productTagsInput') productTagsInputComponent:
     | TagsInputComponent
     | undefined;
-    @ViewChild('productBatchsOptionValuesInput') productBatchsInputComponent:
-    | TagsInputComponent
+    @ViewChildren('productBatchsOptionValuesInput') productBatchsInputComponent:
+    |  QueryList<TagsInputComponent>
     | undefined;
     @ViewChild(IonInfiniteScroll) infinitScroll: IonInfiniteScroll | undefined;
   storeId = inject(storeIdToken);
@@ -70,7 +74,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   environment = inject(environmentToken);
   fbAuth = inject(Auth)
   user = inject(FirebaseUserService).user
-  productTags$: Observable<string[]>;
+  // productTags$: Observable<string[]>;
   selectedTags$: Observable<string[]> | undefined;
   productBatchsOptionValues$: Observable<string[]>;
   selectedBatchs$: Observable<string[] > | undefined;
@@ -78,17 +82,22 @@ export class ProductGallaryComponent implements AfterViewInit {
   scrollEvents: Observable<CustomEvent<void> | 'initialLoad'> | undefined;
   ProductsInstance: Product[] =[];
   docCount$: Observable<number> | undefined;
-  constructor() {
-    const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
-    this.productTags$ = productTagsDoc.pipe(
-      map((ptd) => {
-        if (ptd) {
-          return Object.keys(ptd.tags).map((key) => ptd.tags[key].tagWord);
-        } else {
-          return [];
-        }
-      })
-    )
+  networkStatus$ = inject(FirebaseloggerService).realNetworkStatus
+  isFilterModalVisable = true;;
+  constructor(ar: ActivatedRoute) {
+    ar.params.pipe(takeUntilDestroyed()).subscribe(()=>{
+      this.isFilterModalVisable = true;
+    })
+    // const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
+    // this.productTags$ = productTagsDoc.pipe(
+    //   map((ptd) => {
+    //     if (ptd) {
+    //       return Object.keys(ptd.tags).map((key) => ptd.tags[key].tagWord);
+    //     } else {
+    //       return [];
+    //     }
+    //   })
+    // )
     const batchCustomOptionsDoc = this.storeCustomPropertiesService.getProductBatchsOptions();
     this.productBatchsOptionValues$ = batchCustomOptionsDoc
   }
@@ -101,11 +110,16 @@ export class ProductGallaryComponent implements AfterViewInit {
     // );
   
   ngAfterViewInit(): void {
+
+
+
+
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
-    if (this.productNameWordsInputComponent) {
+    if (this.productNameWordsInputComponents) {
       this.selectedWord$ =
-        this.productNameWordsInputComponent.tagsInputChange.pipe(
+        this.productNameWordsInputComponents.changes.pipe(switchMap((changes:QueryList<TagsInputComponent>)=>changes.first? changes.first.tagsInputChange.asObservable() : of([])))
+        .pipe(
           map((tags) => {
             if (tags && tags.length) {
               const str = tags.join(' ');
@@ -133,7 +147,8 @@ export class ProductGallaryComponent implements AfterViewInit {
 
       if (this.productBatchsInputComponent) {
         this.selectedBatchs$ =
-          this.productBatchsInputComponent?.tagsInputChange.pipe(
+          this.productBatchsInputComponent.changes.pipe(switchMap((changes:QueryList<TagsInputComponent|undefined>)=>changes.first? changes.first.tagsInputChange.asObservable() : of([])))
+          .pipe(
             map((tags) => {
               if (tags && tags.length) {
                 return tags;
@@ -153,10 +168,13 @@ export class ProductGallaryComponent implements AfterViewInit {
       }
 
       const queryConstraints$ = this.selectedWord$.pipe(
-        combineLatestWith(this.selectedBatchs$),
+        combineLatestWith(this.selectedBatchs$),distinctUntilChanged(),
         map(([namePrefex, selectedBatchs]) => {
           console.log('val', namePrefex, 'selectedTags: ', selectedBatchs);
-          this.loaded = false;
+          setTimeout(() => {
+            this.loaded = false;
+            
+          }, 0);
 
           let q: QueryConstraint[] = [];
           if (namePrefex) {
@@ -167,7 +185,7 @@ export class ProductGallaryComponent implements AfterViewInit {
           }
           q = [...q, orderBy('lastEditedOn','desc')]
           return q;
-        }))
+        }), shareReplay({bufferSize:1, refCount:false}))
         this.docCount$ = queryConstraints$.pipe(switchMap(q=>this.productsService.getDocCount(q)));
 
         this.products$ = queryConstraints$.pipe(switchMap(q=>{
@@ -216,7 +234,8 @@ export class ProductGallaryComponent implements AfterViewInit {
         }),
         tap((products) => {
           console.log('products: ', products);
-        })
+        }),
+        shareReplay(1)
       );
       this.suggestions = this.selectedWord$.pipe(
         switchMap((val) => {
@@ -233,7 +252,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   }
 
   onInfinitScroll(ev: Event){
-                   const isEvent =  ev as InfiniteScrollCustomEvent;
+                   const isEvent =  ev as unknown as InfiniteScrollCustomEvent;
                 isEvent.target.complete()
                 const morProducts = this.productsService.getMoreDocs$(21);
                 firstValueFrom(morProducts).then((more)=>{
@@ -248,19 +267,25 @@ export class ProductGallaryComponent implements AfterViewInit {
                // return morProducts;
 
   }
+  canDeactivate(){
+    setTimeout(() => {
+      this.isFilterModalVisable = false;
+    }, 0);
+    return of(true);
+  }
 
   // http://127.0.0.1:9199/v0/b/store-gallary.appspot.com/o/stores%5CtHP7s3ysRD4IU45Z0j8N%5CproductPhotos%5Cthumbs%5Cvj6gyRTCersZW44VNh0O_1500x1500.jpeg?alt=media&token=597d48a7-e378-40ec-8d89-9f6f90ccf1b7
-  getthumbUrl(imgId: string) {
-    const BUCKET_NAME = 'store-gallary.appspot.com';
-    const OBJECT_NAME = `stores/${this.storeId}/productPhotos/thumbs/${imgId}_150x150.jpeg`;
-    let url: string;
-    if (this.environment.useEmulator) {
-      url = `http://127.0.0.1:9199/${BUCKET_NAME}/${OBJECT_NAME}`;
-    } else {
-      url = `https://storage.googleapis.com/${BUCKET_NAME}/${OBJECT_NAME}`;
-    }
-    return url;
-  }
+  // getthumbUrl(imgId: string) {
+  //   const BUCKET_NAME = 'store-gallary.appspot.com';
+  //   const OBJECT_NAME = `stores/${this.storeId}/productPhotos/thumbs/${imgId}_150x150.jpeg`;
+  //   let url: string;
+  //   if (this.environment.useEmulator) {
+  //     url = `http://127.0.0.1:9199/${BUCKET_NAME}/${OBJECT_NAME}`;
+  //   } else {
+  //     url = `https://storage.googleapis.com/${BUCKET_NAME}/${OBJECT_NAME}`;
+  //   }
+  //   return url;
+  // }
   trackBy(index: number, name: Product): string {
     return name.id;
   }

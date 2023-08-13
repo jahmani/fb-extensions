@@ -1,7 +1,7 @@
 import { Injectable, InjectionToken, inject } from '@angular/core';
 import { getApp } from '@angular/fire/app';
-import type { Firestore } from '@angular/fire/firestore';
-import { Observable, from, tap, map, shareReplay } from 'rxjs';
+import { disableNetwork, enableNetwork, Firestore } from '@angular/fire/firestore';
+import { Observable, from, tap, map, shareReplay, first, firstValueFrom } from 'rxjs';
 
 export interface Environment {
   useEmulator: boolean;
@@ -12,6 +12,8 @@ export const environmentToken = new InjectionToken<Environment>('environment', {
     return { useEmulator: false, production: false };
   },
 });
+export const disableNetworkPeriodToken = new InjectionToken<number>('disableNetworkPeriodToken');
+
 
 @Injectable({
   providedIn: 'root',
@@ -19,10 +21,13 @@ export const environmentToken = new InjectionToken<Environment>('environment', {
 export class LasyFirestoreProviderService {
   readonly firestore$: Observable<Firestore>;
   private _firestoreInstance: Firestore | null = null;
+  disableNetworkPeriod= inject(disableNetworkPeriodToken, {optional:true}) || 0;
 
   get firestoreInstance() {
     return this._firestoreInstance;
   }
+
+
   // firestorePromise: Promise<Firestore>;
   // loader: any;
   constructor() {
@@ -43,9 +48,27 @@ export class LasyFirestoreProviderService {
         }) => {
           // const firestore = getFirestore();
           const app = getApp();
-          const firestore = initializeFirestore(app, {
+          const firestore =
+           initializeFirestore(app, {
             localCache: persistentLocalCache(/*settings*/ {}),
           });
+
+          if (this.disableNetworkPeriod) {
+            console.log('network is enabled');
+
+            disableNetwork(firestore).then(()=>{
+              console.log('network disabled');
+              setTimeout(() => {
+                console.log('try to enable network');
+  
+                enableNetwork(firestore).then(()=>{
+                  console.log('network ENabled');
+  
+                });
+              }, this.disableNetworkPeriod);
+            });
+
+          }
 
           // enableIndexedDbPersistence(firestore);
           console.log('useEmulator : ', useEmulator);
@@ -58,6 +81,12 @@ export class LasyFirestoreProviderService {
       shareReplay(),
       tap((firestoreInstance) => (this._firestoreInstance = firestoreInstance))
     );
+  }
+  loadFirestore(){
+    firstValueFrom(this.firestore$).then((fs)=>{
+      console.log('firestore Loaded')
+      return fs;
+    })
   }
 
   // async getFirestoreInstance(){

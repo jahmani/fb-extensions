@@ -11,6 +11,7 @@ import {
   of,
   fromEvent,
   combineLatest,
+  shareReplay,
 } from 'rxjs';
 
 // declare type again LogLevelString since i cant find any way to import it from '@angular/fire/
@@ -66,18 +67,18 @@ export class FirebaseloggerService {
       console.log('navigatorConnectionStatrus', navigatorConnectionStatrus)
     )
   );
-
   readonly realNetworkStatus = combineLatest([
     this.firestoreConnectionStatus,
     this.navgatorNetworkStatus$,
   ]).pipe(
     map(([firestoreConnectionStatus, networkStatus]) => {
       return networkStatus && firestoreConnectionStatus;
-    })
+    }), distinctUntilChanged(), shareReplay(1)
   );
   constructor() {
     console.log('callBackParams');
     // this.realNetworkStatus.subscribe((networkLost)=> console.log("network connected: ", networkLost));
+    this.regesterLogger();
   }
   private isNetworkError(callbackParam: LogCallbackParams | null): boolean| null {
     return (

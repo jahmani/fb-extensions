@@ -1,8 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLinkActive, RouterLink, Router } from '@angular/router';
-import { NgFor } from '@angular/common';
+import { AsyncPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FirebaseUserService } from './authServices/firebase-user.service';
+import { FirebaseloggerService, disableNetworkPeriodToken } from '@store-app-repository/firestor-services';
+
+
+
 @Component({
     selector: 'store-app-repository-root',
     templateUrl: 'app.component.html',
@@ -10,14 +14,26 @@ import { FirebaseUserService } from './authServices/firebase-user.service';
     standalone: true,
     imports: [
         IonicModule,
-        NgFor,
+        NgFor,NgIf,
         RouterLinkActive,
         RouterLink,
+        NgClass,
+        AsyncPipe
     ],
+    providers:[
+      {
+        provide: disableNetworkPeriodToken,
+        useValue: 2000
+      }
+    ]
 })
+
 export class AppComponent implements OnInit {
   fbUserService = inject(FirebaseUserService)
   router = inject(Router);
+  isOnline$ = inject(FirebaseloggerService).realNetworkStatus;
+  showMoreOfflinePrompt = false;
+
   public appPages = [
     { title: 'users', url: 'users', icon: 'people' },
     { title: 'Outbox', url: '/folder/outbox', icon: 'paper-plane' },

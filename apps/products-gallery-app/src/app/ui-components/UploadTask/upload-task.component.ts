@@ -9,7 +9,7 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { percentage, fromTask } from '@angular/fire/storage';
+import { percentage, fromTask, uploadBytesResumable, ref, UploadTaskSnapshot, getDownloadURL } from '@angular/fire/storage';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IonModal, IonicModule } from '@ionic/angular';
 import {
@@ -18,12 +18,7 @@ import {
   UploadTaskComponentData,
 } from '@store-app-repository/app-models';
 
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  UploadTaskSnapshot,
-} from 'firebase/storage';
+
 import { Storage } from '@angular/fire/storage';
 import { Subscription, tap, finalize, catchError, map } from 'rxjs';
 import { ImageCropModalComponent } from '../ImageCropModal/image-crop-modal.component';
@@ -185,7 +180,7 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
       this.imgInfo.uploadTaskData.task
     ).pipe(
       map((snapshot) => {
-        snap = snapshot;
+        snap = snapshot as unknown as UploadTaskSnapshot;
         return { snap: snapshot, ref: storageRef };
       }),
       tap(console.log),

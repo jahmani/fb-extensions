@@ -161,7 +161,7 @@
                     </ion-fab-button>
                   </ion-fab>
 
-                  <ion-img class="ion-margin-vertical" [src]="imgId|imgIdtoThumbUre:1500"></ion-img>
+                  <img class="ion-margin-vertical" style="width: 100%;" [style.aspect-ratio]="oldThumbsProperties[imgId][0].height/oldThumbsProperties[imgId][0].width" [src]="imgId|imgIdtoThumbUre:600"/>
                 </div>
               </div>
             </div>

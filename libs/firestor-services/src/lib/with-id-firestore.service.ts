@@ -4,7 +4,7 @@ import {
   LasyFirestoreProviderService,
   environmentToken,
 } from './lasy-firestore-provider-service';
-import { docSnapshots, collectionSnapshots, startAfter } from '@angular/fire/firestore';
+import { docSnapshots, collectionSnapshots, startAfter, getDocFromCache } from '@angular/fire/firestore';
 import {
   Firestore,
   doc,
@@ -19,6 +19,7 @@ import {
   limit,
   DocumentSnapshot,
   getCountFromServer,
+  getDocsFromCache,
 } from 'firebase/firestore';
 import {
   Observable,
@@ -30,6 +31,10 @@ import {
   throwError,
   from,
   shareReplay,
+  startWith,
+  concat,
+  concatAll,
+  concatWith,
 } from 'rxjs';
 import { FirebaseloggerService } from './firebaselogger.service';
 
@@ -117,7 +122,8 @@ export abstract class WithIdFirestoreService<T extends WithId> {
         }
       ), switchMap((v=>{
         return getCountFromServer(v)
-      })), map(docCount=> docCount.data().count));
+      })), map(docCount=> 
+        docCount.data().count));
 
       return docsCount$;
       
@@ -162,7 +168,16 @@ export abstract class WithIdFirestoreService<T extends WithId> {
         })
     )
 
-    const collData = collRef$.pipe(switchMap((q) => collectionSnapshots(q)));
+    const collData = collRef$.pipe(switchMap((q) => {
+      // const docsFromCach =from(getDocsFromCache(q)).pipe(map(d=>d.docs), tap((r=>{
+      //   console.log("resultsFromCache", r)
+      // })));
+
+       const qS = collectionSnapshots(q).pipe()
+
+      // return docsFromCach.pipe(concatWith(qS));
+      return qS
+    }));
     return collData.pipe(
       tap((d) => {
         // notify for valid network connection
