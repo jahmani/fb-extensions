@@ -70,6 +70,14 @@ export const appRoutes: Route[] = [
           canDeactivate: [componentCanDeactivate]
       },
       {
+        path: 'products/:productId',
+        loadComponent: () =>
+          import('./ProductGallary/product-gallary/product-gallary.component').then(
+            (m) => m.ProductGallaryComponent
+          ),
+          canDeactivate: [componentCanDeactivate]
+      },
+      {
         path: 'users',
         loadComponent: () =>
           import('./ProductGallary/GallaryUsers/gallary-users.component').then(

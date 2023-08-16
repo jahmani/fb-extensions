@@ -117,7 +117,7 @@
         <!-- Casting $event to $any is a temporary fix for this bug https://github.com/ionic-team/ionic-framework/issues/24245 -->
         <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
           <ion-item *ngFor="let imgId of ImgIdsOrdered, let index = index">
-            <ion-thumbnail>
+            <ion-thumbnail class="big-thumb">
               <img sclass="ion-margin-vertical" [src]="imgId|imgIdtoThumbUre:600" />
             </ion-thumbnail>
             <ion-label> img no {{index + 1}} </ion-label>
@@ -153,8 +153,8 @@
           <div class="container">
 
             <div class="ion-margin-bottom child" *ngFor='let imgId of oldImgIds; let i=index '>
-              <div [id]="i">
-                <div class="relative-container ">
+
+              <div class="relative-container ">
                   <ion-fab vertical="top" horizontal="center" edge slot="fixed">
                     <ion-fab-button (click)="onIamgeRemoved(imgId)" size="small">
                       <ion-icon name="trash-outline"></ion-icon>
@@ -163,8 +163,8 @@
 
                   <img class="ion-margin-vertical" style="width: 100%;" [style.aspect-ratio]="oldThumbsProperties[imgId][0].height/oldThumbsProperties[imgId][0].width" [src]="imgId|imgIdtoThumbUre:600"/>
                 </div>
+
               </div>
-            </div>
           </div>
         </ng-container>
 

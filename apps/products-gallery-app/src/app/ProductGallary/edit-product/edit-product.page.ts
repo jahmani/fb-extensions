@@ -309,6 +309,10 @@ export class EditProductPageComponent implements AfterViewInit {
     // const productsCollection = collection(this.firestore,`stores/${this.storeId}/galleries/default/products` )
     // const productDocRef = doc(productsCollection);
     // const productPath = doc(productsCollection).path;
+    if (this.formPhotoComponent?.isBussy()) {
+      this.formPhotoComponent.alertBussy();
+      return false;
+    }
 
     product.storeId = this.storeId;
     product.productGalleryId = this.gallaryId
@@ -365,15 +369,17 @@ if (this.productToUpdate) {
         console.error('Error saving product:', error);
       });
   }
-  private getNamePrefexes(nameWords: string[]): string[] {
-    const namePrefexes = [];
+  private getNamePrefexes(nameWords: string[], namePrefexes?: string[]): string[] {
+    namePrefexes = namePrefexes || [];
     if (nameWords.length) {
-      namePrefexes[0] = nameWords[0];
+      // namePrefexes.push(nameWords[0]);
       let namePrefex = '';
-      for (let index = 1; index < nameWords.length; index++) {
-        namePrefex = nameWords[index - 1] + ' ' + nameWords[index];
-        namePrefexes[index] = namePrefex;
+      for (let index = 1; index <= nameWords.length; index++) {
+        namePrefex = nameWords.slice(0,index).join(' ');
+        namePrefexes.push(namePrefex);
       }
+
+      return this.getNamePrefexes(nameWords.slice(1), namePrefexes)
     }
     // if ((nameWords.length - 1)) {
     //   const nextWords = nameWords.slice(1);

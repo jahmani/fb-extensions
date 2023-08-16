@@ -4,6 +4,7 @@ import { AsyncPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FirebaseUserService } from './authServices/firebase-user.service';
 import { FirebaseloggerService, disableNetworkPeriodToken } from '@store-app-repository/firestor-services';
+import { register } from 'swiper/element';
 
 
 
@@ -43,7 +44,10 @@ export class AppComponent implements OnInit {
     { title: 'Spam', url: '/folder/spam', icon: 'warning' },
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
-  constructor() {}
+  constructor() {
+    register();
+
+  }
   ngOnInit(): void {
     // this.fbUserService.currentAuthStatus.subscribe((user=>{
     //   if (!user) {

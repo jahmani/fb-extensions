@@ -49,7 +49,7 @@ match /products/{productId} {
     request.resource.data.productGalleryId == galleryId &&
     request.resource.data.lastEditedOn == request.time &&
     request.resource.data.lastEditedByUserId == request.auth.uid &&
-    request.resource.data.name != null &&  request.resource.data.name is string && 
+    request.resource.data.name != null &&  request.resource.data.name is string  &&  request.resource.data.name.trim().size() > 0 && 
     request.resource.data.keys().hasOnly(['id', 'storeId', 'productGalleryId', 'firstCreatedOn', 
     'lastEditedOn', 'lastEditedByUserId', 'name',
      'namePrefexes', 'modelNos', 'price', 'brand', 'costPrice', 'note', 'sizes', 'colors', 'origin',

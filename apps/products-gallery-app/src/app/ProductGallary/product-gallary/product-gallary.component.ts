@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { AfterViewInit, CUSTOM_ELEMENTS_SCHEMA, Component, Input, QueryList, ViewChild, ViewChildren, ViewEncapsulation, inject,  } from '@angular/core';
+import { CommonModule, NgOptimizedImage, Location } from '@angular/common';
 import { Auth, signOut } from '@angular/fire/auth';
 import { Product } from '@store-app-repository/app-models';
 import {
@@ -30,6 +30,11 @@ import { orderBy } from 'firebase/firestore';
 import { HydratedImgDirective } from '../../ui-components/hydrated-img.directive';
 import { FirebaseUserService } from '../../authServices/firebase-user.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SwiperOptions, Swiper } from 'swiper/types';
+import { SwipperHelperDirective } from '../../ui-components/swipper-helper.directive';
+// import {A11y, Mousewheel, Navigation, Pagination} from 'swiper';
+
+import {A11y, Mousewheel, Navigation, Pagination} from 'swiper/modules';
 
 
 @Component({
@@ -44,13 +49,26 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     RouterLink,
     ImgIdtoThumbUrePipe,
     HydratedImgDirective,
+    SwipperHelperDirective,
     
   ],
   templateUrl: './product-gallary.component.html',
   styleUrls: ['./product-gallary.component.scss'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+
+  encapsulation: ViewEncapsulation.None,
 })
 export class ProductGallaryComponent implements AfterViewInit {
+  slideView= true;
+  intialSlideIndex = 0;
   // private firestore: Firestore = inject(Firestore)
+  @Input() set productId(value: string) {
+    this.slideView = !!value
+    if (this.ProductsInstance) {
+      this.intialSlideIndex= this.ProductsInstance.findIndex((product)=>product.id === value)
+      this.config.initialSlide = this.intialSlideIndex || 0;
+        }
+  }
   @ViewChildren('productNameWordsInput') productNameWordsInputComponents: QueryList<TagsInputComponent>
     | undefined;
     
@@ -84,7 +102,36 @@ export class ProductGallaryComponent implements AfterViewInit {
   docCount$: Observable<number> | undefined;
   networkStatus$ = inject(FirebaseloggerService).realNetworkStatus
   isFilterModalVisable = true;;
-  constructor(ar: ActivatedRoute) {
+  sliders: string[] = [
+    'Test 1',
+    'Test 2',
+    'Test 3',
+    'Test 4',
+    'Test 5',
+    'Test 6',
+    'Test 7',
+    'Test 8',
+    'Test 9',
+  ]
+
+  public config: SwiperOptions = {
+    modules: [Navigation, Pagination, A11y, Mousewheel],
+    autoHeight: false,
+    initialSlide : this.intialSlideIndex || 0,
+    spaceBetween: 20,
+    navigation: true,
+    pagination: {clickable: true, dynamicBullets: true},
+    slidesPerView: 1,
+    centeredSlides: true,
+    breakpoints: {
+      400: {
+        slidesPerView: "auto",
+        centeredSlides: false
+      },
+    }
+  }
+  constructor(ar: ActivatedRoute,private location: Location) {
+    console.log('products Gallary Constructor')
     ar.params.pipe(takeUntilDestroyed()).subscribe(()=>{
       this.isFilterModalVisable = true;
     })
@@ -286,6 +333,17 @@ export class ProductGallaryComponent implements AfterViewInit {
   //   }
   //   return url;
   // }
+  onSlideChange(event: Event){
+    console.log('slideChange event', event);
+    const swiper = (event as CustomEvent).detail[0] as Swiper;
+    const index = swiper.activeIndex;
+    const productId = this.ProductsInstance[index].id;
+    
+    const url =this.location.path().split('?')[0];
+
+    this.location.replaceState(url,"productId="+productId);
+    
+  }
   trackBy(index: number, name: Product): string {
     return name.id;
   }

@@ -1,3 +1,7 @@
+<ng-container  *ngIf=" products$|async as products">
+
+
+
 <ion-header>
   <ion-toolbar>
     <ng-container *ngIf="user|async as userInfo">
@@ -9,10 +13,16 @@
       Productss
     </ion-title>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
-        <ion-icon slot="start" name="create"></ion-icon>
-        جديد
-      </ion-button>
+      <ng-container *ngIf="slideView;else showNewButton">
+          <ion-back-button></ion-back-button>
+      </ng-container>
+      <ng-template #showNewButton>
+        <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
+          <ion-icon slot="start" name="create"></ion-icon>
+          جديد
+        </ion-button>
+      </ng-template>
+
     </ion-buttons>
     <ion-buttons slot="end">
 
@@ -25,6 +35,78 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
+  <ng-container *ngIf="slideView;else templateName">
+    <swiper-container (slidechange)="onSlideChange($event)" storeAppRepositorySwipperHelper [config]="config" init="false" style="  width: 100%; height: 100%;">
+      <swiper-slide style="width: 100%;height: 100%;"
+      class="slide"
+            *ngFor="let  product of ProductsInstance; trackBy: trackBy; let i=index">
+              <div style="height: 100%; width: 100%;">
+                <div class="overlay box" >
+                  <ion-card *ngIf="product">
+                    <ion-item>
+        
+                      <ion-label class="ion-text-wrap">
+                        <ion-text style="font-size:larger; font-weight: bold;">
+                          <span>{{product.name}}</span>
+                        </ion-text>
+                        <ion-text class="ion-float-end" color="primary">
+                          <span style="font-size: larger; font-weight: bolder;">{{product.price}}</span>
+                        </ion-text>
+                        <ion-note class="product-note">
+                          <span *ngIf="product.modelNos">رقم الموديل: {{product.modelNos}} | </span>
+                          <span *ngIf="product.sizes">القياس: {{product.sizes}} | </span>
+                          <span *ngIf="product.colors">اللون: {{product.colors}} | </span>
+        
+                         </ion-note>
+                      </ion-label>
+                      <ion-icon slot="end" name="create" [routerLink]="['../edit-product', product.id]"></ion-icon>
+                    </ion-item>
+                  </ion-card>
+  
+                </div>
+
+                <div class="container">
+                  <ng-container *ngIf=" product.imageIds &&  product.imageIds[0] ;else noImgs">
+                  <div class="ion-margin-bottom child" *ngFor='let imgId of product.imageIds; let i=index '>
+                      <div class="relative-container ">
+
+                        <img class="ion-margin-vertical" style="width: 100%; object-fit: contain;" 
+
+                        [src]="imgId|imgIdtoThumbUre:600"/>
+                      </div>
+                  </div>                    
+                  </ng-container>
+                  <ng-template #noImgs>
+                    <div class="ion-margin-bottom child">
+                      <div class="relative-container ">
+                        <img class="ion-margin-vertical" style="width: 100%; object-fit: contain;" 
+
+                        src="../../../assets/imgs/noimg.jpg"/>
+                      </div>
+                  </div>              
+                  </ng-template>
+
+                </div>
+      
+      
+                <!-- <ng-container *ngIf="product">
+                  <div >
+                    <img  *ngFor="let image of product.imageIds" loading="lazy" [src]="image |imgIdtoThumbUre:600"
+                      [storeAppRepositoryHydratedImg]="image |imgIdtoThumbUre:200" alt="{{product.name}}" fill />
+                  </div>
+                </ng-container> -->
+              </div>   
+            <ng-template #templateName>
+              <div class="image_container" style="height: 100%;">
+                <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+              </div>
+            </ng-template>
+  
+      </swiper-slide>
+      
+    </swiper-container>
+  </ng-container>
+  <ng-template #templateName>
 
   <cdk-virtual-scroll-viewport itemSize="auto" class="ion-content-scroll-host">
     <ng-container *ngIf="networkStatus$|async">
@@ -59,24 +141,45 @@
     <div class="gallary_container" *ngIf=" products$|async as products ">
 
       <ng-container *ngFor="let  prod of ProductsInstance; trackBy: trackBy; let i=index">
-        <div class="image_container" (click)="previewProduct === prod ? previewProduct= null : previewProduct = prod">
-          <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]"
+        <div class="image_container" 
+
+        (click)="previewProduct === prod ? previewProduct= null : previewProduct = prod"
+        >
+          <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]; else noImg"
             [ngSrc]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" priority="i<22" fill />
+          <ng-template #noImg>
+            <img style="object-fit: cover;" 
+            ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}" priority="i<22" fill />
+          </ng-template>
         </div>
-        <div class="prod-preview" *ngIf="previewProduct === prod" [routerLink]="['../edit-product', prod.id]">
+        <div class="prod-preview" *ngIf="previewProduct === prod" (click)="previewProduct = null" >
           <div class="prod-preview-content">
 
             <div class="card " style="flex: auto;">
+              <ion-fab vertical="top" horizontal="start" slot="fixed">
+                <ion-fab-button class="button-transparent">
+                  <ion-icon name="expand"         routerLink=""
+                  [queryParams]="{productId: prod.id}"></ion-icon>
+                </ion-fab-button>
+              </ion-fab>
               <div class=" card-content">
-                <div class="slides" *ngIf="prod!.imageIds && prod.imageIds[0]">
+                <div class="slides top-scrollbars">
+                  <ng-container *ngIf="prod.imageIds && prod.imageIds[0]; else noImg">
                   <div id="slide-1" class=" image_container" *ngFor="let item of prod!.imageIds">
                     <img loading="lazy" [src]="item |imgIdtoThumbUre:600"
                       [storeAppRepositoryHydratedImg]="item |imgIdtoThumbUre:200" alt="{{prod.name}}" fill />
+                  </div>                    
+                  </ng-container>
+                <ng-template #noImg>
+                  <div id="slide-1" class=" image_container">
+                    <img ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}" fill />
                   </div>
+                </ng-template>
+
                 </div>
               </div>
-              <ion-text class="card-title" color="primary">
-                <h1>{{prod.name}}</h1>
+              <ion-text class="card-title" >
+                <span>{{prod.name}}</span>
               </ion-text>
 
             </div>
@@ -162,6 +265,8 @@
       </swiper>
     </div>
   </ng-container> -->
+</ng-template>
+
 </ion-content>
 
 <ion-modal #modal trigger="open-modal" [isOpen]="isFilterModalVisable" [initialBreakpoint]="0.13"
@@ -175,3 +280,6 @@
         [suggestions]="(productBatchsOptionValues$|async) || []"></store-app-repository-tags-input>
     </ion-content>
   </ng-template>
+</ion-modal>
+
+</ng-container>

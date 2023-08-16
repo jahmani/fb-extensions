@@ -1,3 +1,41 @@
+
+.box {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.85;
+}
+.button-transparent {
+  --background: transparentize(100);
+  --background-hover: #FFFFFF;
+}
+
+.slide{
+}
+.overlay {
+  z-index: 9;
+  // margin: 30px;
+}
+.container {
+  max-height: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  border: 1px solid gray;
+  scroll-snap-type: mandatory;
+  scroll-snap-points-y: repeat(3rem);
+  scroll-snap-type: y mandatory;
+}
+
+.child {
+  height: 100%;
+  scroll-snap-align:start;
+}
+.relative-container{
+  height: 100%;
+   position: relative;
+}
+
 cdk-virtual-scroll-viewport {
   height: 100%;
   width: 100%;
@@ -62,7 +100,7 @@ cdk-virtual-scroll-viewport {
   }
 }
 .card{
-
+  max-width: 100%;
   margin-inline: 10px;
   margin-top: 10px;
   margin-bottom: 10px;}
@@ -78,11 +116,20 @@ cdk-virtual-scroll-viewport {
 .card-content img{
   border-radius: 4px;
 }
-
+div.top-scrollbars {
+  transform: rotateX(180deg);
+}
+div.top-scrollbars * {
+  transform: rotateX(180deg);
+}
 .card-title{
   position: absolute;
-    top: 5px;
-    left: 5px;
+  bottom: 35px;
+  right: 15px;
+  background-color: #a9a9a9;
+  font-size:larger;
+  padding: 5px 10px;
+  color: #FFFFFF;
 }
 
 
@@ -126,7 +173,7 @@ cdk-virtual-scroll-viewport {
   flex-shrink: 0;
   width: 100%;
   height: 300px;
-  margin-right: 50px;
+  // margin-right: 50px;
   border-radius: 10px;
   background: #eee;
   transform-origin: center center;
