@@ -33,7 +33,7 @@
       "https://storage.googleapis.com/store-gallary.appspot.com/stores/*/productPhotos/thumbs/*"
     ],
     "cacheConfig": {
-      "maxSize": 300,
+      "maxSize": 3000,
       "maxAge": "30d",
       "timeout": "1s",
       "strategy": "performance"

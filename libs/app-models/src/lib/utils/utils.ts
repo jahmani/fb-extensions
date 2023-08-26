@@ -28,16 +28,13 @@ export function tagsObjectToTagsArray(tagsObject: ProductDocTags) {
     return a.join() == b.join();
 }
 
-export function handleFileInputEvent(event: Event): FileInfo[] {
-  const files = Array.from( (<HTMLInputElement> event.target).files || []);
-  const extendedFiles = files.map(f=>getExtendedFileData(f));
-  return extendedFiles;
-}
+
 
 export function getExtendedFileData(file: File): FileInfo{
   const { name, type, size } = file;
   const ext = getFileExtension(name);
-  return { name, type, size, ext, file } as FileInfo;
+  const fileUrl =  URL.createObjectURL(file)
+  return { name, type, size, ext, file, fileUrl } as FileInfo;
 }
 
 export function getFileExtension(fname: string) {

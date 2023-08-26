@@ -21,8 +21,8 @@ import {
   FileInfo,
   ImageMeta,
   ProductThumpsProperties,
+  SortableProductThumpsProperties,
   getExtendedFileData,
-  handleFileInputEvent,
 } from '@store-app-repository/app-models';
 
 import { UploadTaskComponent } from '../UploadTask/upload-task.component';
@@ -60,89 +60,31 @@ const defaultFileIdGetter = (fileInfo: FileInfo) => {
 export class FormPhotoControlComponent
   implements OnInit, ControlValueAccessor, AfterViewInit
 {
-  // folderPath1 ;
-
   @Input() folderPath: string | undefined;
   @ViewChild('modal') modal: IonModal | undefined;
-  @ViewChild('reorderModal') reorderModal: IonModal | undefined;
+  // @ViewChild('reorderModal') reorderModal: IonModal | undefined;
 
-  // newUrls: string[] = [];
-  // removedUrls: string[] = [];
-  // formimages: string[] = [];
-  private _value: ProductThumpsProperties = {};
-
+  private _value: SortableProductThumpsProperties[] = [];
+  showReorder = true;
   @ViewChild('fileInput') fileInput: ElementRef | undefined;
   @ViewChildren(UploadTaskComponent) allUploadTasksComponents:
     | QueryList<UploadTaskComponent>
     | undefined;
 
-  //  sharedImgUrl: string;
-  // sharedFiles: { file: File; imgUrl: string }[]=[];
   showBussyAlert = false;
   sharedFilesInfo: FileInfo[] = [];
   inputFiles: FileInfo[] = [];
   uplodedImgFiles: FileInfo[] = [];
-  modalFilesOrImgIds: FileInfo[] | string[] = [];
+  modalFilesOrImgIds: FileInfo[] | SortableProductThumpsProperties[] = [];
   fileIdGetter: ((fileInfo: FileInfo) => Promise<string>) | null;
-  #oldThumbsProperties: ProductThumpsProperties = {};
-  #newThumbsProperties: ProductThumpsProperties = {};
-  ImgIdsOrdered: string[] = [];
-  get oldThumbsProperties(): Readonly<ProductThumpsProperties> {
-    return this.#oldThumbsProperties;
-  }
-  set oldThumbsProperties(val: ProductThumpsProperties) {
-    this.#oldThumbsProperties = val;
-    this.oldImgIds = Object.keys(val);
-  }
-  get newThumbsProperties(): Readonly<ProductThumpsProperties> {
-    return this.#newThumbsProperties;
-  }
-  set newThumbsProperties(val: ProductThumpsProperties) {
-    this.#newThumbsProperties = val;
-    this.newImgIds = Object.keys(val);
-  }
-  oldImgIds: string[] = [];
-  newImgIds: string[] = [];
 
-  set value(value: ProductThumpsProperties) {
-    if (this.ImgIdsOrdered && this.ImgIdsOrdered.length) {
-      this.reorderValueObject(value);
-    } else {
-      this._value = value;
-      this.ImgIdsOrdered = Object.keys(this.value);
-    }
+  set value(value: SortableProductThumpsProperties[]) {
+    this._value = value;
     this.notifyValueChange();
   }
 
-  get value(): ProductThumpsProperties {
+  get value(): SortableProductThumpsProperties[] {
     return this._value;
-  }
-
-  private reorderValueObject(value: ProductThumpsProperties) {
-    const orderedValue: ProductThumpsProperties = {};
-    const valueKeys = Object.keys(value);
-    const newValueKeys = valueKeys.filter(
-      (key) => !this.ImgIdsOrdered.includes(key)
-    );
-    for (let index = 0; index < this.ImgIdsOrdered.length; index++) {
-      const orderdKey = this.ImgIdsOrdered[index];
-      if (value[orderdKey]) {
-        orderedValue[orderdKey] = value[orderdKey];
-      }
-    }
-    for (let index = 0; index < this.ImgIdsOrdered.length; index++) {
-      const orderdKey = this.ImgIdsOrdered[index];
-      if (!value[orderdKey]) {
-        this.ImgIdsOrdered.splice(index, 1);
-      }
-    }
-
-    for (let index = 0; index < newValueKeys.length; index++) {
-      const element = newValueKeys[index];
-      orderedValue[element] = value[element];
-      this.ImgIdsOrdered.push(element);
-    }
-    this._value = orderedValue;
   }
 
   onChange: ((value: unknown) => unknown) | undefined;
@@ -150,8 +92,6 @@ export class FormPhotoControlComponent
   presentingElement = this.ionRouterOutlet.nativeEl;
 
   constructor(
-    // private ImageCropModalService: ImageCropModalService,
-
     private sharedFilesService: SharedFilesService,
     private readonly ionRouterOutlet: IonRouterOutlet
   ) {
@@ -159,7 +99,6 @@ export class FormPhotoControlComponent
   }
   ngAfterViewInit(): void {
     this.sharedFilesService.sharedMediaP.then((sf) => {
-      // this.sharedFiles = sf
       this.sharedFilesInfo = this.extendAllSharedFiles(sf);
     });
   }
@@ -172,14 +111,8 @@ export class FormPhotoControlComponent
 
   ngOnInit(): void {}
 
-  writeValue(obj: ProductThumpsProperties): void {
+  writeValue(obj: SortableProductThumpsProperties[]): void {
     this._value = obj;
-    this.ImgIdsOrdered = Object.keys(obj || {});
-
-    // this.formimages = obj || [];
-    this.oldThumbsProperties = obj || {};
-    this.newThumbsProperties = {};
-    // this.newUrls = [];
   }
 
   registerOnChange(fn: any): void {
@@ -195,84 +128,53 @@ export class FormPhotoControlComponent
     console.log('isDisabled : ', isDisabled);
   }
 
-  // public async deleteRemovedImages() {
-  //   const removeProm = this.removedUrls.map((imgurl) => this.removeImageFile(imgurl));
-  //   return await Promise.all(removeProm);
-  // }
-  // public async deleteUnSubmittedImages() {
-  //   const removeProm = this.newUrls.map((imgurl) =>
-  //     this.removeImageFile(imgurl)
-  //   );
-  //   return await Promise.all(removeProm).then(() => true);
-  // }
-  // cleanResources(){
-  //   return Promise.all([this.deleteRemovedImages(), this.deleteUnSubmittedImages()])
-  // }
-
   onThumbsPropertiesChanged(imgInfo: FileInfo, thumbsMeta: ImageMeta[]) {
     const temp: ProductThumpsProperties = {};
     temp[imgInfo.docId] = thumbsMeta;
-    this.newThumbsProperties = { ...this.newThumbsProperties, ...temp };
+  }
+
+  onDownloadUrlChangeFromThumb(
+    resFile: FileInfo,
+    file: FileInfo,
+    files: FileInfo[]
+  ) {
+    if (!this.modal?.isOpen) {
+      this.onDownloadUrlChange(resFile, file, files);
+    }
   }
   onDownloadUrlChange(resFile: FileInfo, file: FileInfo, files: FileInfo[]) {
-    // const urls =
-    // dont call this method if the file already added
-    // when switching to slide mode, a new uploadTasComponent is created for the same file
-    // when the iploadTask completed before the old uploadTasComponent get distroyed and unsubscribed
-    // then the onDownloadUrlChange is triggered twice
-    // const url = resFile.downloadUrl;
-    // if (this.newUrls.indexOf(url) >= 0) {
-    //   return;
-    // }
     const i = files.indexOf(file);
     if (i != -1) {
       files.splice(i, 1);
-      this.uplodedImgFiles.push(resFile);
       const id = resFile.docId;
-      const temp: ProductThumpsProperties = {};
-      temp[id] = resFile.thumbsMeta;
-      this.newThumbsProperties = { ...this.newThumbsProperties, ...temp };
-      this.value = { ...this.value, ...this.newThumbsProperties };
+      const s: SortableProductThumpsProperties = {
+        imageId: id,
+        index: this.value.length,
+        metas: resFile.thumbsMeta,
+      };
+      this.value = [...this.value, s];
     }
     if (files.length === 0 && this.isHaveOpenModal()) {
       this.closeOpenModal();
     }
-    // this.newUrls = [...this.newUrls, url];
-
-    // this.form.get('images').patchValue([...this.formimages, url]);
   }
+
+  onUploadCancelFromThumb(file: FileInfo, files: FileInfo[]) {
+    if (!this.modal?.isOpen) return this.onUploadCancel(file, files);
+  }
+
   onUploadCancel(file: FileInfo, files: FileInfo[]) {
     const i = files.indexOf(file);
-    files.splice(i, 1);
+    console.log('index of removed file: ', i);
+    if (i !== -1) {
+      files.splice(i, 1);
+    }
   }
 
   onIamgeRemoved(imgID: string) {
-    // const i = this.formimages.indexOf(img);
-    // if (i >= 0) {
-    //   this.formimages.splice(i, 1);
-    //   // this.form.get('images').patchValue([...this.formimages]);
-    //   this.removedUrls = [...this.removedUrls, img];
-    // } else {
-    //   const k = this.newUrls.indexOf(img);
-    //   if (k >= 0) {
-    //     this.newUrls.splice(k, 1);
-    //     // this.removeImageFile(img);
-    //   } else {
-    //     console.log('Image should be either in form urls or form urls');
-    //   }
-    // }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [imgID]: value, ...wThumbsProperties } = {
-      ...this.newThumbsProperties,
-    };
-    this.newThumbsProperties = wThumbsProperties;
-    delete this.value[imgID];
-    this.uplodedImgFiles = this.uplodedImgFiles.filter(
-      (imgFile) => imgFile.docId != imgID
-    );
-
-    this.value = { ...this.value, ...this.newThumbsProperties };
+    const index = this.value.findIndex((m) => m.imageId === imgID);
+    this.value.splice(index, 1);
+    this.notifyValueChange();
   }
 
   extendAllSharedFiles(sharedFiles: { file: File; imgUrl: string }[]) {
@@ -283,12 +185,13 @@ export class FormPhotoControlComponent
   }
 
   async onFileSelected($event: Event) {
-    // this.afStorage.upload('yu', $event.target.files[0]);
     $event.stopPropagation();
     const target = $event.target as HTMLInputElement;
     console.log(target?.files);
 
-    const extendedFiles = handleFileInputEvent($event);
+    const files = Array.from((<HTMLInputElement>$event.target).files || []);
+    const extendedFiles = files.map((f) => getExtendedFileData(f));
+
     this.inputFiles = [...extendedFiles, ...this.inputFiles];
     if (this.inputFiles.length > 0) {
       this.openPhotoModal(this.inputFiles);
@@ -320,29 +223,23 @@ export class FormPhotoControlComponent
     this.showBussyAlert = true;
   }
 
-  // removeImageFile(imgurl: string) {
-  //   const ref1 = ref(this.storage, imgurl);
-  //   console.log('removing image....', ref1.name);
-  //   return deleteObject(ref1);
-  // }
-  openPhotoModal(formimages: FileInfo[] | string[]) {
+  openPhotoModal(formimages: FileInfo[] | SortableProductThumpsProperties[]) {
     this.modalFilesOrImgIds = formimages;
     if (this.modal) {
-      // this.modal?.present();
       this.modal.isOpen = true;
     }
   }
 
   isHaveOpenModal() {
-    return this.reorderModal?.isOpen || this.modal?.isOpen;
+    return this.modal?.isOpen;
   }
+
   closeOpenModal() {
-    if (this.reorderModal && this.reorderModal.isOpen) {
-      this.reorderModal.isOpen = false;
-    } else if (this.modal) {
+    if (this.modal) {
       this.modal.isOpen = false;
     }
   }
+
   isHaveOpenUploadTaskModal() {
     if (this.allUploadTasksComponents) {
       const array = this.allUploadTasksComponents.toArray();
@@ -355,6 +252,7 @@ export class FormPhotoControlComponent
     }
     return false;
   }
+
   closeOpenUploadTaskModal() {
     if (this.allUploadTasksComponents) {
       const array = this.allUploadTasksComponents.toArray();
@@ -369,9 +267,13 @@ export class FormPhotoControlComponent
   }
 
   handleReorder(ev: CustomEvent<ItemReorderEventDetail>) {
-    ev.detail.complete(this.ImgIdsOrdered);
-    this.reorderValueObject(this.value);
+    ev.detail.complete(this.value);
+
     this.notifyValueChange();
+  }
+
+  trackByFileId(index: number, file: FileInfo) {
+    return file.docId;
   }
 
   canDeactivate() {

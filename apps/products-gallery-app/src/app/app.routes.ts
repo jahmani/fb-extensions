@@ -54,7 +54,7 @@ export const appRoutes: Route[] = [
     children: [
       {
         path: 'edit-product/:productId',
-        canDeactivate:[componentCanDeactivate],
+        canDeactivate:[(component: any) =>  component.canDeactivate? component.canDeactivate() : true],
         
         loadComponent: () =>
           import('./ProductGallary/edit-product/edit-product.page').then(

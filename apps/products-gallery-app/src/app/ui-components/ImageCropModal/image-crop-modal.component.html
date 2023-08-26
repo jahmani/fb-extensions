@@ -1,59 +1,47 @@
 <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-button (click)="cancel()">
-          <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-buttons slot="end">
-        <ng-container *ngIf="imgInfo && imgInfo.data; else elseTemplate">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ng-container *ngIf="imgInfo && imgInfo.file; else elseTemplate">
 
-          <ion-fab-button (click)="rotateRight()" size="small">
-            <ion-icon src="../../../assets/rotate.svg"></ion-icon>
-          </ion-fab-button>
-          <ion-fab-button color="primary" [disabled]="!imgInfo.data" (click)="dismissModal()" size="small">
-            <ion-icon name="checkmark-outline"></ion-icon>
-          </ion-fab-button>
-        </ng-container>
-        <ng-template #elseTemplate>
+        <ion-fab-button (click)="rotateRight()" size="small">
+          <ion-icon src="../../../assets/rotate.svg"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-button color="primary" (click)="dismissModal()" size="small">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </ion-fab-button>
+      </ng-container>
+      <ng-template #elseTemplate>
 
-        </ng-template>
-      </ion-buttons>
-      <ion-title>Resize Image</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      </ng-template>
+    </ion-buttons>
+    <ion-title>Resize Image</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-content class="ion-no-padding">
+<ion-content class="ion-no-padding">
 
-        <ng-container *ngIf="imgInfo && imgInfo.data; else noImgDataYet">
-          <ion-row>
-            <ion-col class="ion-no-padding">
+  <ng-container *ngIf="imgInfo && imgInfo.file; else noImgDataYet">
+    <ion-row>
+      <ion-col class="ion-no-padding">
 
-          <image-cropper *ngIf="imgInfo" [canvasRotation]="canvasRotation" [transform]="transform" style="height: 100%;"
-            [imageBase64]="imgInfo.data" [maintainAspectRatio]="false" [aspectRatio]="4 / 4" [resizeToWidth]="0"
-            [imageQuality]='80' [format]="imgInfo.ext" (imageCropped)="imageCropped($event)">
-          </image-cropper>
-          </ion-col>
-          </ion-row>
+        <image-cropper *ngIf="imgInfo" [canvasRotation]="canvasRotation" [transform]="transform" style="height: 100%;"
+          [imageFile]="imgInfo.file" [maintainAspectRatio]="false" [aspectRatio]="4 / 4" [resizeToWidth]="0"
+          [imageQuality]='80' [format]="imgInfo.ext" (imageCropped)="imageCropped($event)">
+        </image-cropper>
+      </ion-col>
+    </ion-row>
 
-        </ng-container>
-        <ng-template #noImgDataYet>
-          <ion-img [src]="imgInfo?.uploadTaskData?.dataUri"></ion-img>
-          <div class="spin">
-            <ion-spinner name="bubbles"></ion-spinner>
-          </div>
-        </ng-template>
+  </ng-container>
+  <ng-template #noImgDataYet>
+    <ion-img [src]="imgInfo?.fileUrl"></ion-img>
+    <div class="spin">
+      <ion-spinner name="bubbles"></ion-spinner>
+    </div>
+  </ng-template>
 
-  </ion-content>
-
-  <!-- <ion-footer>
-    <ion-toolbar>
-      <ion-buttons slot="end">
-        <ion-button color="primary"
-                    [disabled]="!imgInfo.data"
-                    (click)="dismissModal()">
-          Continue
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-footer> -->
+</ion-content>

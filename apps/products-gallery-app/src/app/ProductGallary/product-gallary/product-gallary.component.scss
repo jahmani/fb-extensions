@@ -56,6 +56,9 @@ cdk-virtual-scroll-viewport {
 .placeholder{
   background-color: transparent;
 }
+.zero-hieght{
+  max-height: 0px;
+}
 .image_container img {
   width: 100%;
   height: 100%;
@@ -65,6 +68,7 @@ cdk-virtual-scroll-viewport {
 }
 .prod-preview img {
   width: 100%;
+  font-size: large;
 
   height: 100%;
   //   box-shadow: rgba(3, 8, 20, 0.1) 0px 0.15rem 0.5rem,
@@ -121,6 +125,11 @@ div.top-scrollbars {
 }
 div.top-scrollbars * {
   transform: rotateX(180deg);
+}
+.big-spinner{
+  z-index: 9;
+  width: 80px;
+  height: 80px;
 }
 .card-title{
   position: absolute;
@@ -188,7 +197,7 @@ div.top-scrollbars * {
 }
 img {
   object-fit: cover;
-  position: absolute;
+  // position: absolute;
   top: 0;
   left: 0;
   width: 100%;

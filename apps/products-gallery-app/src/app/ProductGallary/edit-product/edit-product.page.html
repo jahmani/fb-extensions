@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Edit Product 3</ion-title>
+    <ion-title>Edit Product</ion-title>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
@@ -13,7 +13,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <form [formGroup]="productForm"  (ngSubmit)="saveProductToFirestore(productForm.value)">
+  <form [formGroup]="productForm" (ngSubmit)="saveProductToFirestore(productForm.value)">
 
     <store-app-repository-tags-input type="array"
       [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
@@ -22,21 +22,18 @@
       <ion-input label="Name" formControlName="name"></ion-input>
     </ion-item>
 
-<!-- 
-
-    <store-app-repository-tags-input type="array" formControlName="tags" [maxTags]="1" [suggestions]="(productTags| async) || []"
-      label="tags"></store-app-repository-tags-input> -->
-      <form formGroupName="customProperties">
-        <store-app-repository-tags-input type="array" formControlName="batch"  [maxTags]="1" [suggestions]="(batchOptions| async) || []"
-        label="الدفعة"></store-app-repository-tags-input>
-      </form>
+    <form formGroupName="customProperties">
+      <store-app-repository-tags-input type="array" formControlName="batch" [maxTags]="1"
+        [suggestions]="(batchOptions| async) || []" label="الدفعة"></store-app-repository-tags-input>
+    </form>
 
     <ion-item>
       <ion-input label="Price" type="number" formControlName="price"></ion-input>
     </ion-item>
-    <store-app-repository-tags-input type="array" formControlName="modelNos"  [maxTags]="10"
-    label="ModelNo"></store-app-repository-tags-input>
-    <store-app-repository-form-photo-control  formControlName="thumbProperties"></store-app-repository-form-photo-control>
+    <store-app-repository-tags-input type="array" formControlName="modelNos" [maxTags]="10"
+      label="ModelNo"></store-app-repository-tags-input>
+    <store-app-repository-form-photo-control
+      formControlName="thumbProperties"></store-app-repository-form-photo-control>
 
     <ion-item>
       <ion-input label="Brand" formControlName="brand"></ion-input>
@@ -67,7 +64,7 @@
       <input type="file" #fileInput (change)="readImgFile($event)">
       <img [src]="selectedImageSrc" (load)="imgLoaded($event)">
      </ion-item> -->
-<!-- 
+    <!-- 
     <div formArrayName="images">
       <ion-item *ngFor="let imageControl of imagesArray.controls; let i = index">
         <ion-input style="display: none;" [formControlName]="i"></ion-input>
@@ -93,15 +90,15 @@
       <ion-input label="Origin" formControlName="origin"></ion-input>
     </ion-item>
     <ion-button type="submit">Save</ion-button>
-    <ion-button *ngIf="!addNew" (click)="deleteProduct(productForm.value.id)" >delete</ion-button>
+    <ion-button *ngIf="!addNew" (click)="deleteProduct(productForm.value.id)">delete</ion-button>
 
   </form>
 
 </ion-content>
+
 <ion-alert
-  trigger="present-alert"
-  [isOpen]="showLeaveEditWarning"
-  header="الخروج قبل حفظ التغييرات؟!"
-  [buttons]="alertButtons"
-  (didDismiss)="showLeaveEditWarning = false"
+[isOpen]="showLeaveEditWarning"
+header="الخروج قبل حفظ التغييرات؟!"
+[buttons]="alertButtons"
+(didDismiss)="showLeaveEditWarning = false"
 ></ion-alert>

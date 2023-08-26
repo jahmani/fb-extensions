@@ -2,9 +2,18 @@ import type { Timestamp, DocumentData } from '@angular/fire/firestore';
 import type { UserInfo } from '@angular/fire/auth';
 import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import type {UploadTaskSnapshot, UploadTask, StorageReference} from '@angular/fire/storage'
-import type { CropperPosition, ImageTransform, OutputFormat } from 'ngx-image-cropper';
-import { SafeResourceUrl } from '@angular/platform-browser';
+import type {
+  UploadTaskSnapshot,
+  UploadTask,
+  StorageReference,
+} from '@angular/fire/storage';
+import type {
+  // CropperPosition,
+  ImageCroppedEvent,
+  // ImageTransform,
+  OutputFormat,
+} from 'ngx-image-cropper';
+// import { SafeResourceUrl } from '@angular/platform-browser';
 
 export function appModels(): string {
   return 'app-models';
@@ -52,9 +61,15 @@ export interface ImageMeta {
   subName: string;
   width: number;
   height: number;
+  size?: number;
 }
 export interface ProductThumpsProperties {
   [imageId: FirebaseIdString]: ImageMeta[];
+}
+export interface SortableProductThumpsProperties {
+  metas: ImageMeta[];
+  imageId: FirebaseIdString;
+  index: number
 }
 
 export interface ProductVariant {
@@ -70,37 +85,44 @@ export interface ProductVariant {
   note: string;
 }
 
-export interface GallaryHelperDoc extends Editable, Extendable, ProductGalleryDoc {
+export interface GallaryHelperDoc
+  extends Editable,
+    Extendable,
+    ProductGalleryDoc {
   id: FirebaseIdString;
 }
-export interface CustomProperyOption{
+export interface CustomProperyOption {
   value: string;
   freq: number;
-  lastEditedOn?: Timestamp
+  lastEditedOn?: Timestamp;
 }
 export interface CustomPropery extends Editable, Extendable {
-  name: string,
+  name: string;
   options: CustomProperyOption[];
 }
 
-export interface ProductTag{
-  frequency: number; tagWord: string
+export interface ProductTag {
+  frequency: number;
+  tagWord: string;
 }
 export interface ProductTagDoc extends GallaryHelperDoc {
-  tags: {[tagWord:string]: ProductTag};
+  tags: { [tagWord: string]: ProductTag };
   id: 'ProductTag';
 }
-export interface WordSuggestion extends Editable, Extendable, ProductGalleryDoc {
+export interface WordSuggestion
+  extends Editable,
+    Extendable,
+    ProductGalleryDoc {
   suggestions: { frequency: number; suggestion: string }[];
   word: string;
 }
-export interface ProductDocTags{
-  [tagWord: string]: boolean
+export interface ProductDocTags {
+  [tagWord: string]: boolean;
 }
 export interface Product extends Editable, ProductGalleryDoc {
   name: string;
   namePrefexes: string[];
-  nameParts: {[partNumber:string]:string};
+  nameParts: { [partNumber: string]: string };
   modelNos: string[];
   price?: number;
 
@@ -113,15 +135,15 @@ export interface Product extends Editable, ProductGalleryDoc {
 
   imageIds?: FirebaseIdString[];
   thumbProperties?: ProductThumpsProperties;
- 
-  tags?: string[]
+
+  tags?: string[];
   balance?: number;
   variants: { [id: FirebaseIdString]: ProductVariant };
 
   customProperties: { [cpName: string]: string | number | null };
 }
 
-export interface RawAppUser  {
+export interface RawAppUser {
   uid: FirebaseIdString;
   email?: string;
   displayName?: string;
@@ -132,24 +154,22 @@ export interface RawAppUser  {
   providerData?: UserInfo[];
   tokens?: string[];
 }
-export interface AppUser extends RawAppUser, Editable{
-
-}
+export interface AppUser extends RawAppUser, Editable {}
 
 export interface Store extends Editable {
   name: string;
   productGalleries: ProductGallery[];
   productPhotos: ProductPhoto[];
 }
-export interface ProductGalleryUser extends Editable{
-  role:'owner'|'editor'|'manger'|'readonly',
-  userInfo:  RawAppUser
-} 
+export interface ProductGalleryUser extends Editable {
+  role: 'owner' | 'editor' | 'manger' | 'readonly';
+  userInfo: RawAppUser;
+}
 export interface ProductGallery extends Editable, StoreDoc {
   name: string;
   storeId: FirebaseIdString;
   products: Product[];
-  users: ProductGalleryUser[]
+  users: ProductGalleryUser[];
 }
 
 export interface ProductPhoto extends Editable, StoreDoc {
@@ -166,25 +186,18 @@ export interface ProductPhoto extends Editable, StoreDoc {
   refCount: number;
   linkedProducts: FirebaseIdString[];
 }
-export interface FileInfo{
+export interface FileInfo {
   name: string;
   type: string;
   size: number;
-  data?: string;
+  fileUrl: string;
   ext: OutputFormat;
   file: File;
-  imageMeta: ImageMeta
-  thumbsMeta: ImageMeta[]
-  docId: FirebaseIdString,
-  croppeDataBlob?: Blob;
-  croppedData?: string;
-  downloadUrl: string;
+  imageMeta: ImageMeta;
+  thumbsMeta: ImageMeta[];
+  docId: FirebaseIdString;
+  cropInfo: ImageCroppedEvent | null;
   uploadTaskData: UploadTaskComponentData;
-  cropperData? :{
-    position: CropperPosition;
-    cropperTransformData? :  ImageTransform;
-
-  }
 }
 
 export interface SharedFile {
@@ -192,17 +205,16 @@ export interface SharedFile {
   imgUrl: string;
 }
 
-export interface UploadTaskComponentData{
-  dataUri: string;
-  fileData: string | ArrayBuffer;
-  lImgInfo: FileInfo;
-  safeDataUrl: SafeResourceUrl;
-  downloadUrlChange : EventEmitter<string>;
-  cancel : EventEmitter<boolean>;
+export interface UploadTaskComponentData {
+  // dataUri: string;
+  // fileData: string | ArrayBuffer;
+  // lImgInfo: FileInfo;
+  // safeDataUrl: SafeResourceUrl;
+  downloadUrlChange: EventEmitter<string>;
+  cancel: EventEmitter<boolean>;
   task: UploadTask;
 
   percentage: Observable<number>;
-  snapshot: Observable<{ ref: StorageReference;
-    snap: UploadTaskSnapshot; }>;
+  snapshot: Observable<{ ref: StorageReference; snap: UploadTaskSnapshot }>;
   downloadURL: string;
 }

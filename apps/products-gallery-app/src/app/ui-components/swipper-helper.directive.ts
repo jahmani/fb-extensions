@@ -1,5 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, Input, NgZone } from '@angular/core';
-import { SwiperContainer } from 'swiper/element'
+import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
 import { SwiperOptions } from 'swiper/types';
 
 @Directive({
@@ -21,8 +20,11 @@ export class SwipperHelperDirective implements AfterViewInit {
   ngAfterViewInit() {
     Object.assign(this.el.nativeElement, this.config);
     
+
+    setTimeout(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    this.el.nativeElement.initialize();
+      this.el.nativeElement.initialize();
+    }, 0);
   }
 }

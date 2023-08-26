@@ -14,7 +14,6 @@ div[scrollx=true] {
     --size:150px;
     width: 150px;
     height: 150px;
-    position: relative;
 }
 .full-size{
     width: 100%;
@@ -36,7 +35,7 @@ ion-fab{
 .container {
   max-height: 100%;
   overflow-y: scroll;
-  border: 1px solid gray;
+  // border: 1px solid gray;
   scroll-snap-type: mandatory;
   scroll-snap-points-y: repeat(3rem);
   scroll-snap-type: y mandatory;
@@ -45,6 +44,6 @@ ion-fab{
 .child {
   scroll-snap-align: start;
 }
-.relative-container{
+.c-relative-container{
   position: relative;
 }

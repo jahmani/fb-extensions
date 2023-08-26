@@ -9,8 +9,15 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { percentage, fromTask, uploadBytesResumable, ref, UploadTaskSnapshot, getDownloadURL } from '@angular/fire/storage';
-import { DomSanitizer } from '@angular/platform-browser';
+import {
+  percentage,
+  fromTask,
+  uploadBytesResumable,
+  ref,
+  UploadTaskSnapshot,
+  getDownloadURL,
+} from '@angular/fire/storage';
+// import { DomSanitizer } from '@angular/platform-browser';
 import { IonModal, IonicModule } from '@ionic/angular';
 import {
   FileInfo,
@@ -18,11 +25,11 @@ import {
   UploadTaskComponentData,
 } from '@store-app-repository/app-models';
 
-
 import { Storage } from '@angular/fire/storage';
 import { Subscription, tap, finalize, catchError, map } from 'rxjs';
 import { ImageCropModalComponent } from '../ImageCropModal/image-crop-modal.component';
 import { storeIdToken } from '../../app.routes';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
 
 @Component({
   selector: 'store-app-repository-upload-task',
@@ -36,30 +43,24 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   storagePath: string;
 
+  public get dataUri(): string {
+    return this.imgInfo.cropInfo?.objectUrl || this.imgInfo.fileUrl;
+  }
+
   @Input({ required: true }) set imgInfo(val: FileInfo) {
     this.lImgInfo = val;
 
     if (!val.uploadTaskData) {
       val.uploadTaskData = {} as UploadTaskComponentData;
-      val.uploadTaskData.dataUri = URL.createObjectURL(
-        val.croppeDataBlob || val.file
-      );
-      val.uploadTaskData.safeDataUrl =
-        this.sanitizer.bypassSecurityTrustResourceUrl(
-          val.uploadTaskData.dataUri
-        );
-
       val.uploadTaskData.downloadUrlChange = new EventEmitter<string>();
       val.uploadTaskData.cancel = new EventEmitter();
-
-      // this.startUpload();
     }
-    this.subscription = val.uploadTaskData.cancel.subscribe((r) =>
-      this.cancel.emit(r)
+    this.subscription = val.uploadTaskData.cancel.subscribe(() =>
+      this.cancel.emit(this.imgInfo)
     );
     this.subscription.add(
       val.uploadTaskData.downloadUrlChange.subscribe((v) => {
-        this.imgInfo.downloadUrl = v;
+        // this.imgInfo.downloadUrl = v;
         this.downloadComplete.emit(this.imgInfo);
       })
     );
@@ -75,21 +76,16 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
 
   @Output() downloadComplete = new EventEmitter<FileInfo>();
   @Output() thumbsProperiesChanged = new EventEmitter<ImageMeta[]>();
-  @Output() cancel = new EventEmitter();
-  // task: UploadTask;
+  @Output() cancel = new EventEmitter<FileInfo>();
 
   constructor(
-    private storage: Storage,
-    // private db: Firestore,
-
-    private sanitizer: DomSanitizer // private ImageCropModalService: ImageCropModalService, // private pageService: StoragePathService
+    private storage: Storage
   ) {
     const storId = inject(storeIdToken);
     this.storagePath = `/stores/${storId}/productPhotos`;
   }
 
   ngOnInit() {
-    // this.imgInfo.uploadTaskData.startUpload();
   }
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
@@ -99,34 +95,39 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     }
   }
 
-  onUploadCanceled() {
+  onUploadCanceled(event: Event) {
+    event.stopPropagation();
+    let cancelHasEffect = true;
     if (this.imgInfo) {
       if (this.imgInfo.uploadTaskData.task) {
-        this.imgInfo.uploadTaskData.task.cancel();
-        this.imgInfo.uploadTaskData.cancel.emit();
-
-      } else {
+        cancelHasEffect = this.imgInfo.uploadTaskData.task.cancel();
+      }
+      if (cancelHasEffect) {
         this.imgInfo.uploadTaskData.cancel.emit();
       }
     }
   }
   showEditPhoto() {
-    this.showModal(this.imgInfo).then((cropped) => {
-      if (cropped && cropped.croppeDataBlob && this.imgInfo.uploadTaskData) {
-        this.imgInfo.uploadTaskData.dataUri = URL.createObjectURL(
-          cropped.croppeDataBlob
-        );
-      }
+    this.showModal().then((cropped) => {
+      this.imgInfo.cropInfo = cropped;
     });
   }
+
   imgFileLoded(slideImgFile: HTMLImageElement) {
     if (!this.imgInfo.imageMeta) {
       const width = slideImgFile.naturalWidth;
       const height = slideImgFile.naturalHeight;
       console.log('width: ', width, 'height: ', height);
-      this.imgInfo.imageMeta = { width, height, subName: '' };
+      this.imgInfo.imageMeta = {
+        size: this.imgInfo.size,
+        width,
+        height,
+        subName: '',
+      };
 
-      const imgmetas: ImageMeta[] = this.getThumbsProperties(this.imgInfo.imageMeta);
+      const imgmetas: ImageMeta[] = this.getThumbsProperties(
+        this.imgInfo.imageMeta
+      );
       this.thumbsProperiesChanged.emit(imgmetas);
       this.imgInfo.thumbsMeta = imgmetas;
     }
@@ -136,17 +137,14 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     const imgmetas: ImageMeta[] = [];
     for (let index = 0; index < thumbSizes.length; index++) {
       const size = thumbSizes[index];
-      let width = size, height = size;
+      let width = size,
+        height = size;
       if (imageMeta.width > imageMeta.height) {
         height = size;
-        width =
-          (size * imageMeta.height) /
-          imageMeta.width;
+        width = (size * imageMeta.height) / imageMeta.width;
       } else if (imageMeta.width < imageMeta.height) {
         width = size;
-        height =
-          (size * imageMeta.width) /
-          imageMeta.height;
+        height = (size * imageMeta.width) / imageMeta.height;
       }
       imgmetas.push({ width, height, subName: `_${size}x${size}` });
     }
@@ -160,25 +158,31 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
 
     // Reference to storage bucket
     const storageRef = ref(this.storage, path);
-
-    // The main task
-    this.imgInfo.uploadTaskData.task = uploadBytesResumable(
-      storageRef,
-      this.imgInfo.croppeDataBlob || this.imgInfo.file,
-      {
-        // width: this.imgInfo.
-      }
-    );
+    let meta = {};
+    if (this.imgInfo.cropInfo) {
+      const { width, height, ...rest } = this.imgInfo.cropInfo;
+      const size = this.imgInfo.cropInfo.blob?.size;
+      meta = {
+        size: size?.toString(),
+        width: width.toString(),
+        height: height.toString(),
+      };
+    } else {
+      const { width, height, size, ...rest } = this.imgInfo.imageMeta;
+      meta = {
+        size: size?.toString(),
+        width: width.toString(),
+        height: height.toString(),
+      };
+    } // The main task
+    const uploadTask = uploadBytesResumable(storageRef, this.imgInfo.cropInfo?.blob || this.imgInfo.file, { ...meta } );
+    this.imgInfo.uploadTaskData.task = uploadTask;
 
     // Progress monitoring
-    this.imgInfo.uploadTaskData.percentage = percentage(
-      this.imgInfo.uploadTaskData.task
-    ).pipe(tap(console.log));
+    this.imgInfo.uploadTaskData.percentage = percentage(uploadTask).pipe(tap(console.log));
     let snap: UploadTaskSnapshot;
 
-    this.imgInfo.uploadTaskData.snapshot = fromTask(
-      this.imgInfo.uploadTaskData.task
-    ).pipe(
+    this.imgInfo.uploadTaskData.snapshot = fromTask(uploadTask).pipe(
       map((snapshot) => {
         snap = snapshot as unknown as UploadTaskSnapshot;
         return { snap: snapshot, ref: storageRef };
@@ -186,19 +190,14 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
       tap(console.log),
       // The file's download URL
       finalize(async () => {
-        this.imgInfo.uploadTaskData.downloadURL = await getDownloadURL(
-          storageRef
-        );
-        this.imgInfo.downloadUrl = this.imgInfo.uploadTaskData.downloadURL;
-        // await updateDoc(newDocRef, {
-        //   downloadURL: this.imgInfo.uploadTaskData.downloadURL,
-        // }); // downloadURL: this.imgInfo.uploadTaskData.downloadURL,
+        const downloadUrl = await getDownloadURL(storageRef);
+        this.imgInfo.uploadTaskData.downloadURL = downloadUrl;
+        // this.imgInfo.downloadUrl = downloadUrl;
 
-        this.imgInfo.uploadTaskData.downloadUrlChange.emit(
-          this.imgInfo.uploadTaskData.downloadURL
-        );
-        URL.revokeObjectURL(this.imgInfo.uploadTaskData.dataUri);
-        //  return this.downloadURL;
+        this.imgInfo.uploadTaskData.downloadUrlChange.emit(downloadUrl);
+        URL.revokeObjectURL(this.imgInfo.fileUrl);
+        URL.revokeObjectURL(this.imgInfo.cropInfo?.objectUrl as string);
+
         return { snap, ref: storageRef };
       }),
       catchError(async (err) => {
@@ -206,10 +205,9 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
         return { snap, ref: storageRef };
       })
     );
-    // }))
-    return this.imgInfo.uploadTaskData.snapshot
-      .pipe(map((snap) => ({ ref: storageRef, snap })))
-      .toPromise();
+
+    this.subscription?.add(this.imgInfo.uploadTaskData.snapshot.subscribe());
+
   }
 
   isActive(snapshot: UploadTaskSnapshot) {
@@ -219,7 +217,7 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     );
   }
 
-  async showModal(imgInfo: FileInfo): Promise<FileInfo | null> {
+  async showModal(): Promise<ImageCroppedEvent | null> {
     // Lazy load the image crop modal (an Angular Ivy feature)
     if (!this.modal) {
       return null;
@@ -228,8 +226,8 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
 
     const result = await this.modal.onWillDismiss();
 
-    if (result.data && result.data.imgInfo) {
-      return result.data.imgInfo as FileInfo;
+    if (result.data && result.data.cropInfo) {
+      return result.data.cropInfo as ImageCroppedEvent;
     } else {
       return null;
     }

@@ -35,6 +35,7 @@ import { SwipperHelperDirective } from '../../ui-components/swipper-helper.direc
 // import {A11y, Mousewheel, Navigation, Pagination} from 'swiper';
 
 import {A11y, Mousewheel, Navigation, Pagination} from 'swiper/modules';
+import { ProductImgDirective } from '../../ui-components/product-img.directive';
 
 
 @Component({
@@ -49,6 +50,7 @@ import {A11y, Mousewheel, Navigation, Pagination} from 'swiper/modules';
     RouterLink,
     ImgIdtoThumbUrePipe,
     HydratedImgDirective,
+    ProductImgDirective,
     SwipperHelperDirective,
     
   ],
@@ -101,7 +103,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   ProductsInstance: Product[] =[];
   docCount$: Observable<number> | undefined;
   networkStatus$ = inject(FirebaseloggerService).realNetworkStatus
-  isFilterModalVisable = true;;
+  isFilterModalVisable = false;;
   sliders: string[] = [
     'Test 1',
     'Test 2',
@@ -133,7 +135,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   constructor(ar: ActivatedRoute,private location: Location) {
     console.log('products Gallary Constructor')
     ar.params.pipe(takeUntilDestroyed()).subscribe(()=>{
-      this.isFilterModalVisable = true;
+      this.isFilterModalVisable = false;
     })
     // const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
     // this.productTags$ = productTagsDoc.pipe(
@@ -333,6 +335,20 @@ export class ProductGallaryComponent implements AfterViewInit {
   //   }
   //   return url;
   // }
+  loadHDImage(hImage:HydratedImgDirective,imgId:string, size: number ){
+
+    const BUCKET_NAME = 'store-gallary.appspot.com';
+    const OBJECT_NAME = `stores/${this.storeId}/productPhotos/thumbs/${imgId}_${size}x${size}`;
+    let url: string;
+    if (this.environment.useEmulator) {
+      url = `http://127.0.0.1:9199/${BUCKET_NAME}/${OBJECT_NAME}`;
+    } else {
+      url = `https://storage.googleapis.com/${BUCKET_NAME}/${OBJECT_NAME}`;
+    }
+    console.log('url: ', url);
+
+    hImage.setNewRenderedImage(url);
+  }
   onSlideChange(event: Event){
     console.log('slideChange event', event);
     const swiper = (event as CustomEvent).detail[0] as Swiper;
