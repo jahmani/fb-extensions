@@ -158,19 +158,20 @@
             <div class="image_container"
               (click)="previewProduct === prod ? previewProduct= null : previewProduct = prod">
               <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]; else noImg"
-                [ngSrc]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" priority="i<22" fill />
+                [src]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" priority="i<22" fill />
               <ng-template #noImg>
                 <img style="object-fit: cover;" ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}"
                   priority="i<22" fill />
               </ng-template>
             </div>
-            <div class="prod-preview" *ngIf="previewProduct === prod" (click)="previewProduct = null">
+            <div class="prod-preview" *ngIf="previewProduct === prod" routerLink=""
+              [queryParams]="{productId: prod.id}">
               <div class="prod-preview-content">
 
                 <div class="card " style="flex: auto;">
                   <ion-fab vertical="top" horizontal="start" slot="fixed">
-                    <ion-fab-button class="button-transparent">
-                      <ion-icon name="expand" routerLink="" [queryParams]="{productId: prod.id}"></ion-icon>
+                    <ion-fab-button class="button-transparent" (click)="previewProduct = null">
+                      <ion-icon name="chevron-collapse-outline"></ion-icon>
                     </ion-fab-button>
                   </ion-fab>
                   <div class=" card-content">
@@ -281,21 +282,21 @@
 
   </ion-content>
   <ion-footer [class.zero-hieght]="slideView">
-    <ion-toolbar >
+    <ion-toolbar>
       <ng-container *ngIf="networkStatus$|async">
         <div slot="end" class="ion-margin-horizontal" *ngIf="docCount$|async as count">
-          <ion-label>          <ion-icon name="stats-chart-outline"></ion-icon>
+          <ion-label> <ion-icon name="stats-chart-outline"></ion-icon>
             {{count}} products</ion-label>
         </div>
       </ng-container>
-      
+
       <ion-title slot="secondary"></ion-title>
       <ion-buttons slot="start">
         <ng-container *ngIf="isFilterModalVisable; else showDropUpButton">
-        <ion-button (click)="isFilterModalVisable = !isFilterModalVisable">
-          <ion-icon slot="start" name="chevron-down-circle-outline"></ion-icon> hide
-        </ion-button>
-      </ng-container>
+          <ion-button (click)="isFilterModalVisable = !isFilterModalVisable">
+            <ion-icon slot="start" name="chevron-down-circle-outline"></ion-icon> hide
+          </ion-button>
+        </ng-container>
         <ng-template #showDropUpButton>
           <ion-button (click)="isFilterModalVisable = !isFilterModalVisable">
             <ion-icon name="search-outline"></ion-icon>search

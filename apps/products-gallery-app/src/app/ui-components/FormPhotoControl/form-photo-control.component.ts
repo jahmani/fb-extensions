@@ -128,10 +128,10 @@ export class FormPhotoControlComponent
     console.log('isDisabled : ', isDisabled);
   }
 
-  onThumbsPropertiesChanged(imgInfo: FileInfo, thumbsMeta: ImageMeta[]) {
-    const temp: ProductThumpsProperties = {};
-    temp[imgInfo.docId] = thumbsMeta;
-  }
+  // onThumbsPropertiesChanged(imgInfo: FileInfo, thumbsMeta: ImageMeta[]) {
+  //   const temp: ProductThumpsProperties = {};
+  //   temp[imgInfo.docId] = thumbsMeta;
+  // }
 
   onDownloadUrlChangeFromThumb(
     resFile: FileInfo,
@@ -139,14 +139,18 @@ export class FormPhotoControlComponent
     files: FileInfo[]
   ) {
     if (!this.modal?.isOpen) {
-      this.onDownloadUrlChange(resFile, file, files);
+      this.onFileUploadCompleted(resFile, file, files);
     }
   }
-  onDownloadUrlChange(resFile: FileInfo, file: FileInfo, files: FileInfo[]) {
+  onFileUploadCompleted(resFile: FileInfo, file: FileInfo, files: FileInfo[]) {
     const i = files.indexOf(file);
+    if (i === -1) {
+      console.log('onFileUploadCompleted called Twice on same file');
+    }
     if (i != -1) {
       files.splice(i, 1);
       const id = resFile.docId;
+      this.value = this.value || [];
       const s: SortableProductThumpsProperties = {
         imageId: id,
         index: this.value.length,

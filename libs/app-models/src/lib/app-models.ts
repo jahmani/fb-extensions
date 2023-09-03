@@ -6,6 +6,7 @@ import type {
   UploadTaskSnapshot,
   UploadTask,
   StorageReference,
+  StorageError,
 } from '@angular/fire/storage';
 import type {
   // CropperPosition,
@@ -13,7 +14,7 @@ import type {
   // ImageTransform,
   OutputFormat,
 } from 'ngx-image-cropper';
-// import { SafeResourceUrl } from '@angular/platform-browser';
+import { SafeResourceUrl } from '@angular/platform-browser';
 
 export function appModels(): string {
   return 'app-models';
@@ -69,7 +70,7 @@ export interface ProductThumpsProperties {
 export interface SortableProductThumpsProperties {
   metas: ImageMeta[];
   imageId: FirebaseIdString;
-  index: number
+  index: number;
 }
 
 export interface ProductVariant {
@@ -210,11 +211,12 @@ export interface UploadTaskComponentData {
   // fileData: string | ArrayBuffer;
   // lImgInfo: FileInfo;
   // safeDataUrl: SafeResourceUrl;
-  downloadUrlChange: EventEmitter<string>;
-  cancel: EventEmitter<boolean>;
+  uploadSucceeded: EventEmitter<string>;
+  // cancel: EventEmitter<boolean>;
   task: UploadTask;
 
   percentage: Observable<number>;
-  snapshot: Observable<{ ref: StorageReference; snap: UploadTaskSnapshot }>;
-  downloadURL: string;
+  snapshot: Observable<UploadTaskSnapshot>;
+  // downloadURL: string;
+  uploadError: StorageError;
 }

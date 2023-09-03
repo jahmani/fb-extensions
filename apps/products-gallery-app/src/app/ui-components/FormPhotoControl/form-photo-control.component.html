@@ -21,13 +21,11 @@
       <div [class.box-shadow-3d]="inputFiles.length > 1" class="big-thumb">
 
         <ion-fab vertical="top" horizontal="start" edge slot="fixed" *ngIf="!inputFiles[0].uploadTaskData?.snapshot">
-          <ion-fab-button size="small" (click)="onUploadCancelFromThumb(inputFiles[0], inputFiles)">
-            <ion-icon name="close"></ion-icon>
-          </ion-fab-button>
+          <ion-spinner name="bubbles"> {{inputFiles.length}}</ion-spinner>
         </ion-fab>
         <store-app-repository-upload-task [folderPath]='folderPath' [imgInfo]="inputFiles[0]"
           (click)="openPhotoModal(inputFiles)"
-          (downloadComplete)="onDownloadUrlChangeFromThumb($event, inputFiles[0], inputFiles)"
+          (uploadComplete)="onDownloadUrlChangeFromThumb($event, inputFiles[0], inputFiles)"
           (cancel)="onUploadCancelFromThumb($event, inputFiles)">
         </store-app-repository-upload-task>
       </div>
@@ -44,8 +42,7 @@
         </ion-fab>
         <store-app-repository-upload-task [folderPath]='folderPath' [imgInfo]="sharedFilesInfo[0]"
           (click)="openPhotoModal(sharedFilesInfo)"
-          (downloadComplete)="onDownloadUrlChangeFromThumb($event, sharedFilesInfo[0], sharedFilesInfo)"
-          (thumbsProperiesChanged)="onThumbsPropertiesChanged(sharedFilesInfo[0], $event)"
+          (uploadComplete)="onDownloadUrlChangeFromThumb($event, sharedFilesInfo[0], sharedFilesInfo)"
           (cancel)="onUploadCancelFromThumb(sharedFilesInfo[0], sharedFilesInfo)">
         </store-app-repository-upload-task>
         <!-- <ion-thumbnail class="big-thumb" style="opacity: 0.6;" (click)="openPhotoModal(index)">
@@ -122,7 +119,14 @@
                   <ion-thumbnail class="big-thumb">
                     <img sclass="ion-margin-vertical" [src]="imgD.imageId|imgIdtoThumbUre:600" />
                   </ion-thumbnail>
-                  <ion-label> img no {{imgD.index}} </ion-label>
+
+                  <ion-label>
+                    <ion-button (click)="onIamgeRemoved(imgD.imageId)" expand="full">
+                      <ion-icon name="trash-outline"></ion-icon>
+                      remove
+                    </ion-button>
+                    <span> img no {{imgD.index}} </span>
+                  </ion-label>
                   <ion-reorder slot="end"></ion-reorder>
                 </ion-item>
 
@@ -134,7 +138,7 @@
             <div class="container">
               <div class="ion-margin-bottom child" *ngFor='let imgId of value; let i=index '>
                 <div class="c-relative-container ">
-                  <ion-fab vertical="top" horizontal="center" edge slot="fixed">
+                  <ion-fab vertical="top" horizontal="center" slot="fixed">
                     <ion-fab-button (click)="onIamgeRemoved(imgId.imageId)" size="small">
                       <ion-icon name="trash-outline"></ion-icon>
                     </ion-fab-button>
@@ -154,7 +158,7 @@
           <div class="ion-margin-bottom" *ngFor='let file of inputFiles, let index,trackBy:trackByFileId'>
             <div class="relative-container">
               <store-app-repository-upload-task [slideMode]="true" [folderPath]='folderPath' [imgInfo]="file"
-                (downloadComplete)="onDownloadUrlChange($event, file, inputFiles)"
+                (uploadComplete)="onFileUploadCompleted($event, file, inputFiles)"
                 (cancel)="onUploadCancel($event, inputFiles)">
               </store-app-repository-upload-task>
             </div>
@@ -167,7 +171,7 @@
               <div [id]="index">
                 <div class="relative-container">
                   <store-app-repository-upload-task [slideMode]="true" [folderPath]='folderPath' [imgInfo]="file"
-                    (downloadComplete)="onDownloadUrlChange($event, file, sharedFilesInfo)"
+                    (uploadComplete)="onFileUploadCompleted($event, file, sharedFilesInfo)"
                     (cancel)="onUploadCancel(file, sharedFilesInfo)">
                   </store-app-repository-upload-task>
                 </div>

@@ -14,8 +14,6 @@ import {
   fromTask,
   uploadBytesResumable,
   ref,
-  UploadTaskSnapshot,
-  getDownloadURL,
 } from '@angular/fire/storage';
 // import { DomSanitizer } from '@angular/platform-browser';
 import { IonModal, IonicModule } from '@ionic/angular';
@@ -26,7 +24,7 @@ import {
 } from '@store-app-repository/app-models';
 
 import { Storage } from '@angular/fire/storage';
-import { Subscription, tap, finalize, catchError, map } from 'rxjs';
+import { Subscription, tap, map } from 'rxjs';
 import { ImageCropModalComponent } from '../ImageCropModal/image-crop-modal.component';
 import { storeIdToken } from '../../app.routes';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
@@ -40,7 +38,6 @@ import { ImageCroppedEvent } from 'ngx-image-cropper';
 })
 export class UploadTaskComponent implements OnInit, OnDestroy {
   lImgInfo!: FileInfo;
-  subscription: Subscription | undefined;
   storagePath: string;
 
   public get dataUri(): string {
@@ -52,18 +49,11 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
 
     if (!val.uploadTaskData) {
       val.uploadTaskData = {} as UploadTaskComponentData;
-      val.uploadTaskData.downloadUrlChange = new EventEmitter<string>();
-      val.uploadTaskData.cancel = new EventEmitter();
+      val.uploadTaskData.uploadSucceeded = new EventEmitter();
     }
-    this.subscription = val.uploadTaskData.cancel.subscribe(() =>
-      this.cancel.emit(this.imgInfo)
-    );
-    this.subscription.add(
-      val.uploadTaskData.downloadUrlChange.subscribe((v) => {
-        // this.imgInfo.downloadUrl = v;
-        this.downloadComplete.emit(this.imgInfo);
-      })
-    );
+    val.uploadTaskData.uploadSucceeded.subscribe((v) => {
+      this.uploadComplete.emit(val);
+    });
   }
   get imgInfo() {
     return this.lImgInfo;
@@ -74,25 +64,18 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   @Input() folderPath: string | undefined;
   @Input() slideMode: boolean | undefined;
 
-  @Output() downloadComplete = new EventEmitter<FileInfo>();
-  @Output() thumbsProperiesChanged = new EventEmitter<ImageMeta[]>();
+  @Output() uploadComplete = new EventEmitter<FileInfo>();
   @Output() cancel = new EventEmitter<FileInfo>();
 
-  constructor(
-    private storage: Storage
-  ) {
+  constructor(private storage: Storage) {
     const storId = inject(storeIdToken);
     this.storagePath = `/stores/${storId}/productPhotos`;
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
   }
 
   onUploadCanceled(event: Event) {
@@ -102,8 +85,28 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
       if (this.imgInfo.uploadTaskData.task) {
         cancelHasEffect = this.imgInfo.uploadTaskData.task.cancel();
       }
-      if (cancelHasEffect) {
-        this.imgInfo.uploadTaskData.cancel.emit();
+      if (cancelHasEffect || this.imgInfo.uploadTaskData.uploadError) {
+        this.cancel.emit(this.imgInfo);
+      }
+    }
+  }
+
+  onUploadResume(event: Event) {
+    event.stopPropagation();
+    let resumeHasEffect = true;
+    if (this.imgInfo) {
+      if (this.imgInfo.uploadTaskData.task) {
+        resumeHasEffect = this.imgInfo.uploadTaskData.task.resume();
+      }
+    }
+  }
+
+  onUploadPause(event: Event) {
+    event.stopPropagation();
+    let pauseHasEffect = true;
+    if (this.imgInfo) {
+      if (this.imgInfo.uploadTaskData.task) {
+        pauseHasEffect = this.imgInfo.uploadTaskData.task.pause();
       }
     }
   }
@@ -128,7 +131,6 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
       const imgmetas: ImageMeta[] = this.getThumbsProperties(
         this.imgInfo.imageMeta
       );
-      this.thumbsProperiesChanged.emit(imgmetas);
       this.imgInfo.thumbsMeta = imgmetas;
     }
   }
@@ -175,46 +177,40 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
         height: height.toString(),
       };
     } // The main task
-    const uploadTask = uploadBytesResumable(storageRef, this.imgInfo.cropInfo?.blob || this.imgInfo.file, { ...meta } );
+    const uploadTask = uploadBytesResumable(
+      storageRef,
+      this.imgInfo.cropInfo?.blob || this.imgInfo.file,
+      { ...meta }
+    );
+    uploadTask.then(
+      async (snapshot) => {
+        //  const downloadUrl = await getDownloadURL(storageRef);
+        // this.imgInfo.uploadTaskData.downloadURL = downloadUrl;
+        // this.imgInfo.downloadUrl = downloadUrl;
+        this.imgInfo.uploadTaskData.uploadSucceeded.emit();
+        // this.imgInfo.uploadTaskData.uploadSucceeded.emit();
+      },
+      (error) => {
+        console.log('error upload ', error);
+        switch (error.code) {
+          case 'storage/canceled':
+            break;
+
+          default:
+            this.imgInfo.uploadTaskData.uploadError = error;
+            break;
+        }
+      }
+    );
     this.imgInfo.uploadTaskData.task = uploadTask;
 
     // Progress monitoring
-    this.imgInfo.uploadTaskData.percentage = percentage(uploadTask).pipe(tap(console.log));
-    let snap: UploadTaskSnapshot;
-
-    this.imgInfo.uploadTaskData.snapshot = fromTask(uploadTask).pipe(
-      map((snapshot) => {
-        snap = snapshot as unknown as UploadTaskSnapshot;
-        return { snap: snapshot, ref: storageRef };
-      }),
-      tap(console.log),
-      // The file's download URL
-      finalize(async () => {
-        const downloadUrl = await getDownloadURL(storageRef);
-        this.imgInfo.uploadTaskData.downloadURL = downloadUrl;
-        // this.imgInfo.downloadUrl = downloadUrl;
-
-        this.imgInfo.uploadTaskData.downloadUrlChange.emit(downloadUrl);
-        URL.revokeObjectURL(this.imgInfo.fileUrl);
-        URL.revokeObjectURL(this.imgInfo.cropInfo?.objectUrl as string);
-
-        return { snap, ref: storageRef };
-      }),
-      catchError(async (err) => {
-        console.log('error upload ', err);
-        return { snap, ref: storageRef };
-      })
+    this.imgInfo.uploadTaskData.percentage = percentage(uploadTask).pipe(
+      map((p) => p.progress.toFixed(0)),
+      tap(console.log)
     );
 
-    this.subscription?.add(this.imgInfo.uploadTaskData.snapshot.subscribe());
-
-  }
-
-  isActive(snapshot: UploadTaskSnapshot) {
-    return (
-      snapshot.state === 'running' &&
-      snapshot.bytesTransferred < snapshot.totalBytes
-    );
+    this.imgInfo.uploadTaskData.snapshot = fromTask(uploadTask);
   }
 
   async showModal(): Promise<ImageCroppedEvent | null> {

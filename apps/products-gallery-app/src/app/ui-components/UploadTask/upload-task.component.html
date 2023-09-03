@@ -8,15 +8,55 @@
   <ng-container *ngIf="slideMode; else thumbView">
     <div style="position: relative;">
       <ng-container *ngIf="imgInfo.uploadTaskData.snapshot ; else noUploadYet">
-        <ion-fab vertical="top" horizontal="start" slot="fixed">
-          <ion-fab-button (click)="onUploadCanceled($event)" size="big">
-            <ion-icon name="close"></ion-icon>
-            <ion-spinner *ngIf="!imgInfo.uploadTaskData.downloadURL" name="circular"></ion-spinner>
+        <ng-container
+          *ngIf="{snapshot: imgInfo.uploadTaskData.snapshot|async, percentage: imgInfo.uploadTaskData.percentage|async} as data">
+          <ion-fab vertical="top" horizontal="start" slot="fixed">
+            <ng-container *ngIf="imgInfo.uploadTaskData.uploadError else noErrors">
+              <ion-fab-button size="big"> error
+              </ion-fab-button>
+              <ion-fab-button (click)="startUpload()" size="small">
+                <ion-icon name="cloud-upload-outline"></ion-icon>
+              </ion-fab-button>
+              <ion-fab-button (click)="onUploadCanceled($event)" size="big">
+                <ion-icon name="close"></ion-icon>
+              </ion-fab-button>
+            </ng-container>
+            <ng-template #noErrors>
+              <ng-container *ngIf="data.snapshot?.state === 'running'">
+                <ion-fab-button>
+                  <span style="position: fixed;">{{data.percentage}}%</span>
+                  <ion-spinner style="position: static;" name="circular"></ion-spinner>
+                </ion-fab-button>
+                <ion-fab-button (click)="onUploadPause($event)" size="big">
+                  <ion-icon name="pause-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-button (click)="onUploadCanceled($event)" size="big">
+                  <ion-icon name="close"></ion-icon>
+                </ion-fab-button>
+              </ng-container>
+              <ng-container *ngIf="data.snapshot?.state === 'paused'">
+                <ion-fab-button (click)="onUploadResume($event)" size="big">
+                  <ion-icon name="play-circle-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-button (click)="onUploadCanceled($event)" size="big">
+                  <ion-icon name="close"></ion-icon>
+                </ion-fab-button>
+              </ng-container>
+              <ng-container *ngIf="data.snapshot?.state !!== 'paused' && data.snapshot?.state !!== 'running'">
+                <ion-fab-button size="big">
+                  <span>{{data.snapshot?.state}}</span>
+                </ion-fab-button>
+                <ion-fab-button (click)="onUploadCanceled($event)" size="big">
+                  <ion-icon name="close"></ion-icon>
+                </ion-fab-button>
+              </ng-container>
+            </ng-template>
 
-          </ion-fab-button>
-        </ion-fab>
-        <div class="spin">
-        </div>
+
+          </ion-fab>
+          <div class="spin">
+          </div>
+        </ng-container>
       </ng-container>
       <ng-template #noUploadYet>
         <ion-fab vertical="top" horizontal="start" slot="fixed">
@@ -37,14 +77,15 @@
   <ng-template #thumbView>
     <div style="position: relative;">
       <ng-container *ngIf="imgInfo.uploadTaskData.snapshot">
-        <ion-fab vertical="top" horizontal="center" edge slot="fixed">
-          <ion-fab-button (click)="onUploadCanceled($event)" size="small">
-            <ion-icon name="close"></ion-icon>
+        <ion-fab vertical="top" horizontal="start" slot="fixed">
+          <ion-fab-button size="small">
+            <!-- <ion-icon name="close"></ion-icon> -->
+            <ion-spinner style="position: static;" name="circular"></ion-spinner>
           </ion-fab-button>
         </ion-fab>
-        <div class="spin" *ngIf="!imgInfo.uploadTaskData.downloadURL">
+        <!-- <div class="spin" *ngIf="!imgInfo.uploadTaskData.downloadURL">
           <ion-spinner name="circular"></ion-spinner>
-        </div>
+        </div> -->
       </ng-container>
       <ion-thumbnail class="big-thumb" style="opacity: 0.6;">
         <ion-img [src]="dataUri" class="44"></ion-img>
