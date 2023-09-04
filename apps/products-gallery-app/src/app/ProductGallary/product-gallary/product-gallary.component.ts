@@ -80,6 +80,8 @@ export class ProductGallaryComponent implements AfterViewInit {
   ProductsInstance: Product[] = [];
   slidsInput = { intialSlideIndex: 0, products: this.ProductsInstance };
   dynamicSlidesComponent: typeof ProductsSlidesViewComponent | null = null;
+  filterTerms$: Observable<[string, string[]]> | undefined;
+  filterText$: Observable<string> | undefined;
   // private firestore: Firestore = inject(Firestore)
   @Input() set productId(value: string) {
     if (value) {
@@ -110,9 +112,9 @@ export class ProductGallaryComponent implements AfterViewInit {
     | QueryList<TagsInputComponent>
     | undefined;
 
-  @ViewChild('productTagsInput') productTagsInputComponent:
-    | TagsInputComponent
-    | undefined;
+  // @ViewChild('productTagsInput') productTagsInputComponent:
+  //   | TagsInputComponent
+  //   | undefined;
   @ViewChildren('productBatchsOptionValuesInput') productBatchsInputComponent:
     | QueryList<TagsInputComponent>
     | undefined;
@@ -131,7 +133,7 @@ export class ProductGallaryComponent implements AfterViewInit {
   fbAuth = inject(Auth);
   user = inject(FirebaseUserService).user;
   // productTags$: Observable<string[]>;
-  selectedTags$: Observable<string[]> | undefined;
+  // selectedTags$: Observable<string[]> | undefined;
   productBatchsOptionValues$: Observable<string[]>;
   selectedBatchs$: Observable<string[]> | undefined;
   loaded = false;
@@ -190,20 +192,20 @@ export class ProductGallaryComponent implements AfterViewInit {
           }),
           startWith('')
         );
-      if (this.productTagsInputComponent) {
-        this.selectedTags$ =
-          this.productTagsInputComponent?.tagsInputChange.pipe(
-            map((tags) => {
-              if (tags && tags.length) {
-                return tags;
-              }
-              return [];
-            }),
-            startWith([])
-          );
-      } else {
-        this.selectedTags$ = of([]);
-      }
+      // if (this.productTagsInputComponent) {
+      //   this.selectedTags$ =
+      //     this.productTagsInputComponent?.tagsInputChange.pipe(
+      //       map((tags) => {
+      //         if (tags && tags.length) {
+      //           return tags;
+      //         }
+      //         return [];
+      //       }),
+      //       startWith([])
+      //     );
+      // } else {
+      //   this.selectedTags$ = of([]);
+      // }
 
       if (this.productBatchsInputComponent) {
         this.selectedBatchs$ = this.productBatchsInputComponent.changes
@@ -232,6 +234,27 @@ export class ProductGallaryComponent implements AfterViewInit {
       } else {
         this.scrollEvents = of('initialLoad');
       }
+      this.filterTerms$ = this.selectedWord$.pipe(
+        combineLatestWith(this.selectedBatchs$),
+        distinctUntilChanged(),
+        shareReplay(1)
+      );
+      this.filterText$ = this.filterTerms$.pipe(
+        map(([name, batchs]) => {
+          let res = '';
+          if (name) {
+            res = name;
+          }
+          if (batchs && batchs.length) {
+            res +=
+              ' @' +
+              batchs.reduce((prev, cur, index) => {
+                return index === 0 ? cur : prev + '|' + cur;
+              }, '');
+          }
+          return res;
+        })
+      );
 
       const queryConstraints$ = this.selectedWord$.pipe(
         combineLatestWith(this.selectedBatchs$),

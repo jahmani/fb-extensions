@@ -4,11 +4,7 @@
 
   <ion-header>
     <ion-toolbar>
-      <ng-container *ngIf="user|async as userInfo">
-        <ion-thumbnail class="small-thumb" slot="end" *ngIf="userInfo && userInfo.photoURL">
-          <ion-img [src]="userInfo.photoURL" />
-        </ion-thumbnail>
-      </ng-container>
+
       <ion-title>
         products
       </ion-title>
@@ -17,20 +13,25 @@
           <ion-back-button [defaultHref]="'store/'+storeId+'/products'"></ion-back-button>
         </ng-container>
         <ng-template #showNewButton>
-          <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
-            <ion-icon slot="start" name="create"></ion-icon>
-            جديد
-          </ion-button>
+          <ng-container *ngIf="user|async as userInfo">
+            <ion-thumbnail class="small-thumb" slot="end" *ngIf="userInfo && userInfo.photoURL">
+              <ion-img [src]="userInfo.photoURL" />
+            </ion-thumbnail>
+          </ng-container>
         </ng-template>
 
       </ion-buttons>
       <ion-buttons slot="end">
-
+        <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
+          <ion-icon slot="start" name="create"></ion-icon>
+          <span>جديد</span>
+        </ion-button>
 
         <ion-button (click)="logout()">
           <ion-icon slot="start" name="log-out-outline"></ion-icon>
-
+          <span>خروج</span>
         </ion-button>
+
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -52,15 +53,6 @@
     <ng-template #templateName>
 
       <cdk-virtual-scroll-viewport itemSize="auto" class="ion-content-scroll-host">
-
-        <!-- <ng-template #elseTemplate>
-      <ion-item color="warning" *ngIf="docCount$|async as count, else noDocCount">
-        <ion-icon slot="start" name="add"></ion-icon>
-        <ion-label>unknown products count, cant access remote</ion-label>
-      </ion-item>
-
-   </ng-template> -->
-
 
         <ng-template #noDocCount>
           <ion-item>
@@ -142,66 +134,8 @@
           </ion-infinite-scroll-content>
         </ion-infinite-scroll>
 
-
-
-
-
-        <!--           
-
-    <ion-row   *ngIf="products$| async as products">
-        <ion-col size="auto"  *cdkVirtualFor="let  prod of products; let i=index" class="photo-grid-item">
-          <img  class="grid-img" [src]="getthumbUrl(prod!.imageIds![0])" alt="" />
-        </ion-col>
-</ion-row> -->
-
-
       </cdk-virtual-scroll-viewport>
 
-
-
-      <!-- <ng-container *ngIf="data.slideIndex != null;">
-    <div class="swipper-wrapper" dir="rtl">
-
-      <swiper [config]="options" [virtual]="true" mode="md" scrollbar="md" (slideChange)="onSlideChanged2($event)"
-        style="min-height: 100%;">
-
-        <ng-template swiperSlide *ngFor="let product of data.products; let i=index ">
-          <div [id]="i">
-            <div class="slide-content">
-              <ion-card *ngIf="product">
-                <ion-item>
-
-                  <ion-label class="ion-text-wrap">
-                    <ion-text style="font-size:larger; font-weight: bold;">
-                      <span>{{product.name}}</span>
-                    </ion-text>
-                    <ion-text class="ion-float-end" color="primary">
-                      <span style="font-size: larger; font-weight: bolder;">{{product.price}}</span>
-                    </ion-text>
-                    <ion-note class="product-note">
-                      <span *ngIf="product.modelNo">رقم الموديل: {{product.modelNo}} | </span>
-                      <span *ngIf="product.size">القياس: {{product.size}} | </span>
-                      <span *ngIf="product.color">اللون: {{product.color}} | </span>
-
-
-                    </ion-note>
-                  </ion-label>
-                </ion-item>
-              </ion-card>
-
-
-              <ng-container *ngIf="product">
-                <div class="slide-images scroll-container">
-                  <ion-img class="ion-margin-vertical scroll-child" *ngFor="let image of product.images"
-                    [src]="image"></ion-img>
-                </div>
-              </ng-container>
-            </div>
-          </div>
-        </ng-template>
-      </swiper>
-    </div>
-  </ng-container> -->
     </ng-template>
 
   </ion-content>
@@ -222,29 +156,32 @@
           </ion-button>
         </ng-container>
         <ng-template #showDropUpButton>
-          <ion-button (click)="isFilterModalVisable = !isFilterModalVisable">
-            <ion-icon name="search-outline"></ion-icon>search
-          </ion-button>
+          <div style="    display: flex;
+          align-items: center;
+          border-radius: 15px;" *ngIf="{filterText: filterText$|async} as filterData">
+            <div style="  
+            flex-wrap: nowrap;
+            display: flex;
+            align-items: center;" (click)="isFilterModalVisable = !isFilterModalVisable">
+              <ion-icon slot="start" name="search-outline"></ion-icon>
+              <span>{{filterData.filterText || 'بحث'}}</span>
+            </div>
+            <ion-icon slot="end" name="close"
+              (click)="productBatchsOptionValuesInput.setValue([]); productNameWordsInput.setValue([]); "
+              *ngIf="filterData.filterText"></ion-icon>
+          </div>
         </ng-template>
       </ion-buttons>
     </ion-toolbar>
     <div [hidden]="!isFilterModalVisable">
-      <store-app-repository-tags-input #productNameWordsInput type="array"
-        [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
-      <store-app-repository-tags-input #productBatchsOptionValuesInput [showInputCtrl]=true type="array" label="الدفعة"
-        [suggestions]="(productBatchsOptionValues$|async) || []"></store-app-repository-tags-input>
+      <form>
+        <store-app-repository-tags-input #productNameWordsInput type="array"
+          [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
+        <store-app-repository-tags-input #productBatchsOptionValuesInput [showInputCtrl]=true type="array"
+          label="الدفعة" [suggestions]="(productBatchsOptionValues$|async) || []"></store-app-repository-tags-input>
+      </form>
     </div>
 
   </ion-footer>
-
-  <!-- <ion-modal #modaltrigger="open-modal" [isOpen]="isFilterModalVisable" [initialBreakpoint]="0.13"
-  [breakpoints]="[0.05, 0.13,0.25, 0.5, 0.75]" [backdropDismiss]="false" [backdropBreakpoint]="0.5">
-
-  <ng-template>
-    <ion-content class="ion-padding">
-
-    </ion-content>
-  </ng-template>
-</ion-modal> -->
 
 </ng-container>
