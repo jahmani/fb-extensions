@@ -1,15 +1,18 @@
 import {
   AfterViewInit,
-  CUSTOM_ELEMENTS_SCHEMA,
   Component,
   Input,
   QueryList,
   ViewChild,
   ViewChildren,
-  ViewEncapsulation,
   inject,
 } from '@angular/core';
-import { CommonModule, NgOptimizedImage, Location } from '@angular/common';
+import {
+  CommonModule,
+  NgOptimizedImage,
+  Location,
+  NgComponentOutlet,
+} from '@angular/common';
 import { Auth, signOut } from '@angular/fire/auth';
 import { Product } from '@store-app-repository/app-models';
 import {
@@ -39,7 +42,7 @@ import {
 } from '@store-app-repository/firestor-services';
 import { QueryConstraint, where } from '@angular/fire/firestore';
 import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { storeIdToken } from '../../app.routes';
 import { ImgIdtoThumbUrePipe } from '../../ui-components/img-idto-thumb-ure.pipe';
 import { StoreCustomPropertiesService } from '../../dataServices/store-custom-properties.service';
@@ -47,13 +50,10 @@ import { orderBy } from 'firebase/firestore';
 import { HydratedImgDirective } from '../../ui-components/hydrated-img.directive';
 import { FirebaseUserService } from '../../authServices/firebase-user.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { SwiperOptions, Swiper } from 'swiper/types';
-import { SwipperHelperDirective } from '../../ui-components/swipper-helper.directive';
-// import {A11y, Mousewheel, Navigation, Pagination} from 'swiper';
 
-import { A11y, Mousewheel, Navigation, Pagination } from 'swiper/modules';
 import { ProductImgDirective } from '../../ui-components/product-img.directive';
 import { RetryImgLoadDirective } from '../../ui-components/retry-img-load.directive';
+import { ProductsSlidesViewComponent } from '../../ui-components/ProductsSlidesView/products-slides-view.component';
 
 @Component({
   selector: 'store-app-repository-product-gallary',
@@ -69,25 +69,41 @@ import { RetryImgLoadDirective } from '../../ui-components/retry-img-load.direct
     HydratedImgDirective,
     RetryImgLoadDirective,
     ProductImgDirective,
-    SwipperHelperDirective,
+    NgComponentOutlet,
   ],
   templateUrl: './product-gallary.component.html',
   styleUrls: ['./product-gallary.component.scss'],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-
-  encapsulation: ViewEncapsulation.None,
 })
 export class ProductGallaryComponent implements AfterViewInit {
   slideView = true;
   intialSlideIndex = 0;
+  ProductsInstance: Product[] = [];
+  slidsInput = { intialSlideIndex: 0, products: this.ProductsInstance };
+  dynamicSlidesComponent: typeof ProductsSlidesViewComponent | null = null;
   // private firestore: Firestore = inject(Firestore)
   @Input() set productId(value: string) {
-    this.slideView = !!value;
+    if (value) {
+      this.setSlidesView(value);
+    } else {
+      this.slideView = false;
+    }
+  }
+  async setSlidesView(value: string) {
+    this.slideView = true;
+
+    if (!this.dynamicSlidesComponent) {
+      const { ProductsSlidesViewComponent } = await import(
+        '../../ui-components/ProductsSlidesView/products-slides-view.component'
+      );
+      this.dynamicSlidesComponent = ProductsSlidesViewComponent;
+    }
+
     if (this.ProductsInstance) {
       this.intialSlideIndex = this.ProductsInstance.findIndex(
         (product) => product.id === value
       );
-      this.config.initialSlide = this.intialSlideIndex || 0;
+      this.slidsInput.intialSlideIndex = this.intialSlideIndex;
+      // this.config.initialSlide = this.intialSlideIndex || 0;
     }
   }
   @ViewChildren('productNameWordsInput') productNameWordsInputComponents:
@@ -120,38 +136,10 @@ export class ProductGallaryComponent implements AfterViewInit {
   selectedBatchs$: Observable<string[]> | undefined;
   loaded = false;
   scrollEvents: Observable<CustomEvent<void> | 'initialLoad'> | undefined;
-  ProductsInstance: Product[] = [];
   docCount$: Observable<number> | undefined;
   networkStatus$ = inject(FirebaseloggerService).realNetworkStatus;
   isFilterModalVisable = false;
-  sliders: string[] = [
-    'Test 1',
-    'Test 2',
-    'Test 3',
-    'Test 4',
-    'Test 5',
-    'Test 6',
-    'Test 7',
-    'Test 8',
-    'Test 9',
-  ];
 
-  public config: SwiperOptions = {
-    modules: [Navigation, Pagination, A11y, Mousewheel],
-    autoHeight: false,
-    initialSlide: this.intialSlideIndex || 0,
-    spaceBetween: 20,
-    navigation: true,
-    pagination: { clickable: true, dynamicBullets: true },
-    slidesPerView: 1,
-    centeredSlides: true,
-    breakpoints: {
-      400: {
-        slidesPerView: 'auto',
-        centeredSlides: false,
-      },
-    },
-  };
   constructor(ar: ActivatedRoute, private location: Location) {
     console.log('products Gallary Constructor');
     ar.params.pipe(takeUntilDestroyed()).subscribe(() => {
@@ -370,29 +358,6 @@ export class ProductGallaryComponent implements AfterViewInit {
   //   }
   //   return url;
   // }
-  loadHDImage(hImage: HydratedImgDirective, imgId: string, size: number) {
-    const BUCKET_NAME = 'store-gallary.appspot.com';
-    const OBJECT_NAME = `stores/${this.storeId}/productPhotos/thumbs/${imgId}_${size}x${size}`;
-    let url: string;
-    if (this.environment.useEmulator) {
-      url = `http://127.0.0.1:9199/${BUCKET_NAME}/${OBJECT_NAME}`;
-    } else {
-      url = `https://storage.googleapis.com/${BUCKET_NAME}/${OBJECT_NAME}`;
-    }
-    console.log('url: ', url);
-
-    hImage.setNewRenderedImage(url);
-  }
-  onSlideChange(event: Event) {
-    console.log('slideChange event', event);
-    const swiper = (event as CustomEvent).detail[0] as Swiper;
-    const index = swiper.activeIndex;
-    const productId = this.ProductsInstance[index].id;
-
-    const url = this.location.path().split('?')[0];
-
-    this.location.replaceState(url, 'productId=' + productId);
-  }
   trackBy(index: number, name: Product): string {
     return name.id;
   }

@@ -14,7 +14,7 @@
       </ion-title>
       <ion-buttons slot="start">
         <ng-container *ngIf="slideView;else showNewButton">
-          <ion-back-button></ion-back-button>
+          <ion-back-button [defaultHref]="'store/'+storeId+'/products'"></ion-back-button>
         </ng-container>
         <ng-template #showNewButton>
           <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
@@ -36,94 +36,18 @@
   </ion-header>
   <ion-content>
     <ng-container *ngIf="slideView;else templateName">
-      <swiper-container (slidechange)="onSlideChange($event)" storeAppRepositorySwipperHelper [config]="config"
-        init="false" style="  width: 100%; height: 100%;">
-        <swiper-slide style="width: 100%;height: 100%;" class="slide"
-          *ngFor="let  product of ProductsInstance; trackBy: trackBy; let i=index">
-          <div style="height: 100%; width: 100%;">
-            <div class="overlay box">
-              <ion-card *ngIf="product">
-                <ion-item>
 
-                  <ion-label class="ion-text-wrap">
-                    <ion-text style="font-size:larger; font-weight: bold;">
-                      <span>{{product.name}}</span>
-                    </ion-text>
-                    <ion-text class="ion-float-end" color="primary">
-                      <span style="font-size: larger; font-weight: bolder;">{{product.price}}</span>
-                    </ion-text>
-                    <ion-note class="product-note">
-                      <span *ngIf="product.modelNos">رقم الموديل: {{product.modelNos}} | </span>
-                      <span *ngIf="product.sizes">القياس: {{product.sizes}} | </span>
-                      <span *ngIf="product.colors">اللون: {{product.colors}} | </span>
+      <ng-container *ngIf="dynamicSlidesComponent;else loadingSlidesTemplate">
+        <ng-template
+          *ngComponentOutlet="dynamicSlidesComponent; inputs:{products:ProductsInstance, intialSlideIndex:intialSlideIndex} ">
+        </ng-template>
+      </ng-container>
+      <ng-template #loadingSlidesTemplate>
+        <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+      </ng-template>
 
-                    </ion-note>
-                  </ion-label>
-                  <ion-icon slot="end" name="create" [routerLink]="['../edit-product', product.id]"></ion-icon>
-                </ion-item>
-              </ion-card>
-
-            </div>
-
-            <div class="container">
-              <ng-container *ngIf=" product.imageIds &&  product.imageIds[0] ;else noImgs">
-                <div class="ion-margin-bottom child" *ngFor='let imgId of product.imageIds; let i=index '>
-                  <div class="relative-container ">
-
-                    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-                      <ng-container *ngIf="hImage.isLoading;else hImageNotLoading">
-                        <ion-fab-button>
-                          <ion-spinner name="bubbles" class="big-spinner"></ion-spinner>
-                        </ion-fab-button>
-                      </ng-container>
-                      <ng-template #hImageNotLoading>
-                        <ng-container *ngIf="hImage.isError;else hImageNotError">
-                          <ion-fab-button (click)="loadHDImage(hImage,imgId, 1500 )">
-                            <ion-icon name="refresh"></ion-icon>
-                          </ion-fab-button>
-                        </ng-container>
-                        <ng-template #hImageNotError>
-                          <ion-fab-button (click)="loadHDImage(hImage,imgId, 1500 )">
-                            <ion-icon name="image"></ion-icon>
-                          </ion-fab-button>
-                        </ng-template>
-                      </ng-template>
-
-                    </ion-fab>
-                    <img class="ion-margin-vertical" #hImage="storeAppRepositoryHydratedImg"
-                      style="width: 100%; object-fit: contain;"
-                      [storeAppRepositoryHydratedImg]="imgId |imgIdtoThumbUre:600" [src]="imgId|imgIdtoThumbUre:200" />
-                  </div>
-                </div>
-              </ng-container>
-              <ng-template #noImgs>
-                <div class="ion-margin-bottom child">
-                  <div class="relative-container ">
-                    <img class="ion-margin-vertical" style="width: 100%; object-fit: contain;"
-                      src="../../../assets/imgs/noimg.jpg" />
-                  </div>
-                </div>
-              </ng-template>
-
-            </div>
-
-
-            <!-- <ng-container *ngIf="product">
-                  <div >
-                    <img  *ngFor="let image of product.imageIds" loading="lazy" [src]="image |imgIdtoThumbUre:600"
-                      [storeAppRepositoryHydratedImg]="image |imgIdtoThumbUre:200" alt="{{product.name}}" fill />
-                  </div>
-                </ng-container> -->
-          </div>
-          <ng-template #templateName>
-            <div class="image_container" style="height: 100%;">
-              <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
-            </div>
-          </ng-template>
-
-        </swiper-slide>
-
-      </swiper-container>
+      <!-- <store-app-repository-products-slides-view [products]="ProductsInstance"
+        [intialSlideIndex]="intialSlideIndex"></store-app-repository-products-slides-view> -->
     </ng-container>
     <ng-template #templateName>
 
