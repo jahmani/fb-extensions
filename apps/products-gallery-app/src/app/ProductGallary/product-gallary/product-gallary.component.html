@@ -140,6 +140,7 @@
 
   </ion-content>
   <ion-footer [class.zero-hieght]="slideView">
+
     <ion-toolbar>
       <ng-container *ngIf="networkStatus$|async">
         <div slot="end" class="ion-margin-horizontal" *ngIf="docCount$|async as count">
@@ -154,6 +155,7 @@
           <ion-button (click)="isFilterModalVisable = !isFilterModalVisable">
             <ion-icon slot="start" name="chevron-down-circle-outline"></ion-icon> hide
           </ion-button>
+
         </ng-container>
         <ng-template #showDropUpButton>
           <div style="    display: flex;
@@ -166,20 +168,15 @@
               <ion-icon slot="start" name="search-outline"></ion-icon>
               <span>{{filterData.filterText || 'بحث'}}</span>
             </div>
-            <ion-icon slot="end" name="close"
-              (click)="productBatchsOptionValuesInput.setValue([]); productNameWordsInput.setValue([]); "
-              *ngIf="filterData.filterText"></ion-icon>
+            <ion-icon slot="end" name="close" (click)="filterFormControl.patchValue([])"
+              *ngIf=" filterFormControl.value?.length"></ion-icon>
           </div>
         </ng-template>
       </ion-buttons>
     </ion-toolbar>
     <div [hidden]="!isFilterModalVisable">
-      <form>
-        <store-app-repository-tags-input #productNameWordsInput type="array"
-          [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
-        <store-app-repository-tags-input #productBatchsOptionValuesInput [showInputCtrl]=true type="array"
-          label="الدفعة" [suggestions]="(productBatchsOptionValues$|async) || []"></store-app-repository-tags-input>
-      </form>
+      <store-app-repository-product-filter #productFilterForm
+        [formControl]="filterFormControl"></store-app-repository-product-filter>
     </div>
 
   </ion-footer>

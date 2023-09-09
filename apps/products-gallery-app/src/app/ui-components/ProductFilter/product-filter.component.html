@@ -1,0 +1,25 @@
+<!--  -->
+<form [formGroup]="queryForm">
+
+    <store-app-repository-tags-input #productNameWordsInput type="array" formControlName="namePrefexes"
+        [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
+
+    <form formGroupName="customProperties">
+        <store-app-repository-tags-input #productBatchsOptionValuesInput [showInputCtrl]=true type="array"
+            label="الدفعة" formControlName="batch"
+            [suggestions]="(productBatchsOptionValues$|async) || []"></store-app-repository-tags-input>
+    </form>
+    <!-- <ion-button (click)="showPopover($event)" expand="block" fill="clear" shape="round">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+    </ion-button> -->
+</form>
+
+<!-- <ion-popover [isOpen]="isPopoverOpen" (didDismiss)="onPopoverDismiss()" triggerAction="click">
+    <ng-template>
+        <ion-content class="ion-padding">
+            <ion-button (click)="saveQuery()" expand="block" fill="clear" shape="round">
+                save
+            </ion-button>
+        </ion-content>
+    </ng-template>
+</ion-popover> -->

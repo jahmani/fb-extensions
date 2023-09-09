@@ -1,11 +1,18 @@
-import type { Timestamp, DocumentData } from '@angular/fire/firestore';
+import type {
+  Timestamp,
+  DocumentData,
+  FieldPath,
+  WhereFilterOp,
+  QueryFieldFilterConstraint,
+  OrderByDirection,
+  QueryOrderByConstraint,
+} from '@angular/fire/firestore';
 import type { UserInfo } from '@angular/fire/auth';
 import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import type {
   UploadTaskSnapshot,
   UploadTask,
-  StorageReference,
   StorageError,
 } from '@angular/fire/storage';
 import type {
@@ -14,7 +21,6 @@ import type {
   // ImageTransform,
   OutputFormat,
 } from 'ngx-image-cropper';
-import { SafeResourceUrl } from '@angular/platform-browser';
 
 export function appModels(): string {
   return 'app-models';
@@ -205,18 +211,50 @@ export interface SharedFile {
   file: File;
   imgUrl: string;
 }
+export interface AppQueryOrderByConstraint extends QueryOrderByConstraint {
+  fieldPath: 'lastEditedOn' | 'firstCreatedOn' | FieldPath;
+  directionStr?: OrderByDirection;
+}
+export interface AppQueryFieldFilterConstraint
+  extends QueryFieldFilterConstraint {
+  fieldPath: 'namePrefexes' | 'customProperties.batch' | FieldPath;
+  opStr: WhereFilterOp;
+  value: number | string | string[];
+}
+export interface NamePrefexesFilterConstraint
+  extends AppQueryFieldFilterConstraint {
+  fieldPath: 'namePrefexes';
+  opStr: 'array-contains';
+  value: string;
+}
+export interface BatchFilterConstraint extends AppQueryFieldFilterConstraint {
+  fieldPath: 'customProperties.batch';
+  opStr: 'in' | '==';
+  value: string[];
+}
+
+export type AndCompositeQuery = (
+  | NamePrefexesFilterConstraint
+  | BatchFilterConstraint
+  | AppQueryOrderByConstraint
+)[];
+export type OrCompositeQuery = AndCompositeQuery[];
+export interface productGallaryQuery
+  extends WithId,
+    Editable,
+    StoreDoc,
+    ProductGalleryDoc {
+  query: OrCompositeQuery;
+  name: string;
+  descreption: string;
+  photoUrl: string;
+}
 
 export interface UploadTaskComponentData {
-  // dataUri: string;
-  // fileData: string | ArrayBuffer;
-  // lImgInfo: FileInfo;
-  // safeDataUrl: SafeResourceUrl;
   uploadSucceeded: EventEmitter<string>;
-  // cancel: EventEmitter<boolean>;
   task: UploadTask;
 
   percentage: Observable<number>;
   snapshot: Observable<UploadTaskSnapshot>;
-  // downloadURL: string;
   uploadError: StorageError;
 }
