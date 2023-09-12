@@ -15,11 +15,11 @@
 <ion-content>
   <form [formGroup]="productForm" (ngSubmit)="saveProductToFirestore(productForm.value)">
 
-    <store-app-repository-tags-input type="array"
-      [suggestions]="(suggestions|async) || []"></store-app-repository-tags-input>
+    <store-app-repository-tags-input type="array" [suggestions]="(suggestions|async) || []"
+      [formControl]="namePartsInputCtrl"></store-app-repository-tags-input>
 
     <ion-item>
-      <ion-input label="Name" formControlName="name"></ion-input>
+      <ion-input label="Name" #nameInput formControlName="name"></ion-input>
     </ion-item>
 
     <form formGroupName="customProperties">
@@ -30,10 +30,12 @@
     <ion-item>
       <ion-input label="Price" type="number" formControlName="price"></ion-input>
     </ion-item>
-    <store-app-repository-tags-input type="array" formControlName="modelNos" [maxTags]="10"
+
+    <store-app-repository-tags-input [showTagsBar]="false" formControlName="modelNos" [maxTags]="10"
       label="ModelNo"></store-app-repository-tags-input>
+
     <store-app-repository-form-photo-control
-      formControlName="thumbProperties"></store-app-repository-form-photo-control>
+      [formControl]="sortableProductThumpsPropertiesCtrl"></store-app-repository-form-photo-control>
 
     <ion-item>
       <ion-input label="Brand" formControlName="brand"></ion-input>
@@ -90,15 +92,12 @@
       <ion-input label="Origin" formControlName="origin"></ion-input>
     </ion-item>
     <ion-button type="submit">Save</ion-button>
-    <ion-button *ngIf="!addNew" (click)="deleteProduct(productForm.value.id)">delete</ion-button>
+    <ion-button *ngIf="!addNew"
+      (click)="productForm.value.id && deleteProduct(productForm.value.id)">delete</ion-button>
 
   </form>
 
 </ion-content>
 
-<ion-alert
-[isOpen]="showLeaveEditWarning"
-header="الخروج قبل حفظ التغييرات؟!"
-[buttons]="alertButtons"
-(didDismiss)="showLeaveEditWarning = false"
-></ion-alert>
+<ion-alert [isOpen]="showLeaveEditWarning" header="الخروج قبل حفظ التغييرات؟!" [buttons]="alertButtons"
+  (didDismiss)="showLeaveEditWarning = false"></ion-alert>

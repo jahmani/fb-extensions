@@ -9,10 +9,8 @@ import {
   InjectionToken,
 } from '@angular/core';
 import {
-  FormBuilder,
   FormGroup,
   Validators,
-  FormArray,
   ReactiveFormsModule,
   FormControl,
 } from '@angular/forms';
@@ -21,7 +19,7 @@ import {
   FileInfo,
   FirebaseIdString,
   Product,
-  ImageMeta,
+  // ImageMeta,
   SortableProductThumpsProperties,
   ProductThumpsProperties,
 } from '@store-app-repository/app-models';
@@ -36,15 +34,17 @@ import {
   Subject,
   firstValueFrom,
   map,
-  of,
   startWith,
+  // of,
+  // startWith,
   switchMap,
 } from 'rxjs';
-import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
+// import { GallaryHelperDocsDataService } from '../../dataServices/gallary-helper-docs-data.service';
 import { productGalleryIdToken, storeIdToken } from '../../app.routes';
 import { FormPhotoControlComponent } from '../../ui-components/FormPhotoControl/form-photo-control.component';
 import { TransformCtrlValueByDirective } from '../../ui-components/transform-ctrl-value-by.directive';
 import { StoreCustomPropertiesService } from '../../dataServices/store-custom-properties.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export const FileIdGetterToken = new InjectionToken<
   (fileInfo: FileInfo) => Promise<FirebaseIdString>
@@ -56,19 +56,19 @@ const getIdFactor = () => {
     return newImageId;
   };
 };
-export type ControlsOf<T extends Record<string, any>> = {
-  [K in keyof T]: T[K] extends Record<any, any>
-    ? FormGroup<ControlsOf<T[K]>>
-    : FormControl<T[K]>;
-};
-interface Profile {
-  firstName: string;
-  lastName: string;
-  address?: {
-    street: string;
-    city: string;
-  };
-}
+// export type ControlsOf<T extends Record<string, any>> = {
+//   [K in keyof T]: T[K] extends Record<any, any>
+//     ? FormGroup<ControlsOf<T[K]>>
+//     : FormControl<T[K]>;
+// };
+// interface Profile {
+//   firstName: string;
+//   lastName: string;
+//   address?: {
+//     street: string;
+//     city: string;
+//   };
+// }
 
 @Component({
   selector: 'store-app-repository-edit-product-page',
@@ -88,9 +88,9 @@ interface Profile {
   providers: [{ provide: FileIdGetterToken, useFactory: getIdFactor }],
 })
 export class EditProductPageComponent implements AfterViewInit {
-  @ViewChild(TagsInputComponent) tagsInputComponent:
-    | TagsInputComponent
-    | undefined;
+  // @ViewChild(TagsInputComponent) tagsInputComponent:
+  //   | TagsInputComponent
+  //   | undefined;
 
   @ViewChild(FormPhotoControlComponent) formPhotoComponent:
     | FormPhotoControlComponent
@@ -101,6 +101,28 @@ export class EditProductPageComponent implements AfterViewInit {
   batchOptions: Observable<string[] | undefined>;
   showLeaveEditWarning = false;
   productToUpdate: Product | undefined;
+  productForm: FormGroup<{
+    name: FormControl<string>;
+    id: FormControl<string>;
+    price: FormControl<number | undefined>;
+    brand: FormControl<string>;
+    costPrice: FormControl<number | undefined>;
+    note: FormControl<string>;
+    modelNos: FormControl<string[] | undefined>;
+    sizes: FormControl<string[] | undefined>;
+    colors: FormControl<string[] | undefined>;
+    // images: new FormControl(undefined, {nonNullable:true}),
+    imageIds: FormControl<string[] | undefined>;
+    thumbProperties: FormControl<ProductThumpsProperties | undefined>;
+    // tags: new FormControl(undefined, {nonNullable:true}),
+    balance: FormControl<number | undefined>;
+    origin: FormControl<string | undefined>;
+    customProperties: FormGroup<{ batch: FormControl<string | undefined> }>;
+  }>;
+  sortableProductThumpsPropertiesCtrl: FormControl<
+    SortableProductThumpsProperties[] | null | undefined
+  >;
+  namePartsInputCtrl: FormControl<string[] | null | undefined>;
 
   // private _productId: string;
   @Input() set productId(value: string) {
@@ -126,9 +148,13 @@ export class EditProductPageComponent implements AfterViewInit {
           product.imageIds,
           product.thumbProperties
         );
-        this.productForm.patchValue({ ...product, thumbProperties: s });
-        const productNameWords = product.name.split(' ');
-        this.tagsInputComponent?.setValue(productNameWords);
+        this.sortableProductThumpsPropertiesCtrl.patchValue(s);
+
+        this.productForm.patchValue({ ...product });
+        const productNameWords = product.name?.split(' ') || [];
+        this.namePartsInputCtrl.patchValue(productNameWords);
+
+        // this.tagsInputComponent?.setValue(productNameWords);
         this.productToUpdate = product;
       } else {
         console.log('product not fount');
@@ -140,23 +166,20 @@ export class EditProductPageComponent implements AfterViewInit {
   storeId = inject(storeIdToken);
   gallaryId = inject(productGalleryIdToken); // "tHP7s3ysRD4IU45Z0j8N"
   private productsService = inject(ProductsDataService);
-  private gallaryHelperDocsDataService = inject(GallaryHelperDocsDataService);
+  // private gallaryHelperDocsDataService = inject(GallaryHelperDocsDataService);
   private location = inject(Location);
   suggestionsService = inject(WordSuggestionsDataService);
   storeCustomPropertiesService = inject(StoreCustomPropertiesService);
 
-  productForm: FormGroup;
-  imagesArray: FormArray;
-  selectedImageSrc: string | ArrayBuffer | null | undefined;
-  imgProperties: ImageMeta | undefined;
-  selectedFile: File | undefined;
-  imageIdsArray: FormArray;
-  productTags: Observable<string[]>;
+  // imagesArray: FormArray;
+  // selectedImageSrc: string | ArrayBuffer | null | undefined;
+  // imgProperties: ImageMeta | undefined;
+  // selectedFile: File | undefined;
+  // imageIdsArray: FormArray;
+  // productTags: Observable<string[]>;
 
-  constructor(
-    private formBuilder: FormBuilder = inject(FormBuilder) // private firestore: Firestore = inject(Firestore)
-  ) // private storage: Storage = inject(Storage)
-  {
+  constructor() {
+    // formBuilder: FormBuilder = inject(FormBuilder) // private firestore: Firestore = inject(Firestore) // private storage: Storage = inject(Storage)
     // const profileForm = new FormGroup<ControlsOf<Profile>>({
     //   firstName: new FormControl('', { nonNullable: true }),
     //   lastName: new FormControl('', { nonNullable: true }),
@@ -168,6 +191,10 @@ export class EditProductPageComponent implements AfterViewInit {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
+    this.sortableProductThumpsPropertiesCtrl = new FormControl<
+      SortableProductThumpsProperties[] | undefined
+    >(undefined);
+    this.namePartsInputCtrl = new FormControl<string[] | undefined>([]);
     this.productForm = new FormGroup({
       name: new FormControl('', {
         nonNullable: true,
@@ -177,68 +204,111 @@ export class EditProductPageComponent implements AfterViewInit {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      price: new FormControl(undefined, {
+      price: new FormControl<number | undefined>(undefined, {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      brand: new FormControl('', { nonNullable: true }),
-      costPrice: new FormControl(undefined, { nonNullable: true }),
-      note: new FormControl(undefined, { nonNullable: true }),
-      modelNos: new FormControl(undefined, { nonNullable: true }),
-      sizes: new FormControl(undefined, { nonNullable: true }),
-      colors: new FormControl(undefined, { nonNullable: true }),
+      brand: new FormControl<string>('', { nonNullable: true }),
+      costPrice: new FormControl<number | undefined>(undefined, {
+        nonNullable: true,
+      }),
+      note: new FormControl('', { nonNullable: true }),
+      modelNos: new FormControl<string[] | undefined>(undefined, {
+        nonNullable: true,
+      }),
+      sizes: new FormControl<string[] | undefined>(undefined, {
+        nonNullable: true,
+      }),
+      colors: new FormControl<string[] | undefined>(undefined, {
+        nonNullable: true,
+      }),
       // images: new FormControl(undefined, {nonNullable:true}),
-      imageIds: new FormControl(undefined, { nonNullable: true }),
-      thumbProperties: new FormControl(undefined, { nonNullable: true }),
+      imageIds: new FormControl<string[] | undefined>(undefined, {
+        nonNullable: true,
+      }),
+      thumbProperties: new FormControl<ProductThumpsProperties | undefined>(
+        undefined,
+        { nonNullable: true }
+      ),
       // tags: new FormControl(undefined, {nonNullable:true}),
-      balance: new FormControl(undefined, { nonNullable: true }),
-      origin: new FormControl(undefined, { nonNullable: true }),
+      balance: new FormControl<number | undefined>(undefined, {
+        nonNullable: true,
+      }),
+      origin: new FormControl<string | undefined>(undefined, {
+        nonNullable: true,
+      }),
       customProperties: new FormGroup({
-        batch: new FormControl('', { nonNullable: true }),
+        batch: new FormControl<string | undefined>('', { nonNullable: true }),
       }),
     });
 
-    this.imagesArray = this.productForm.get('images') as FormArray;
-    this.imageIdsArray = this.productForm.get('imageIds') as FormArray;
+    // this.imagesArray = this.productForm.get('images') as FormArray;
+    // this.imageIdsArray = this.productForm.get('imageIds') as FormArray;
 
-    const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
-    this.productTags = productTagsDoc.pipe(
-      map((ptd) => {
-        if (ptd) {
-          return Object.keys(ptd.tags).map((key) => ptd.tags[key].tagWord);
-        } else {
-          return [];
-        }
-      })
-    );
+    // const productTagsDoc = this.gallaryHelperDocsDataService.getProductTags();
+    // this.productTags = productTagsDoc.pipe(
+    //   map((ptd) => {
+    //     if (ptd) {
+    //       return Object.keys(ptd.tags).map((key) => ptd.tags[key].tagWord);
+    //     } else {
+    //       return [];
+    //     }
+    //   })
+    // );
 
     const batchCustomOptionsDoc =
       this.storeCustomPropertiesService.getProductBatchsOptions();
     this.batchOptions = batchCustomOptionsDoc;
+
+    this.namePartsInputCtrl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((v) =>
+        this.productForm.controls['name'].patchValue(v?.join(' ') || '')
+      );
+    this.sortableProductThumpsPropertiesCtrl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((thumbPropertiesArray) => {
+        if (thumbPropertiesArray) {
+          const { imageIds, thumbProperties } =
+            this.toThumbPropertiesObject(thumbPropertiesArray);
+          this.productForm.controls['thumbProperties'].patchValue(
+            thumbProperties
+          );
+          this.productForm.controls['imageIds'].patchValue(imageIds);
+        }
+      });
   }
 
   ngAfterViewInit(): void {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
 
-    if (this.tagsInputComponent) {
-      this.selectedWord$ = this.tagsInputComponent.tagsInputChange.pipe(
-        map((tags) => {
-          console.log(tags);
-          // return (tags as string || 'zeroWord');
-          if (tags && tags.length) {
-            const str = (tags as string[]).join(' ');
-            this.productForm.controls['name'].patchValue(str);
-            return str;
-          } else {
-            return 'zeroWord';
-          }
-        }),
-        startWith('zeroWord')
-      );
-    } else {
-      this.selectedWord$ = of('zeroWord');
-    }
+    // if (this.tagsInputComponent) {
+    //   this.selectedWord$ = this.tagsInputComponent.tagsInputChange.pipe(
+    //     map((tags) => {
+    //       console.log(tags);
+    //       // return (tags as string || 'zeroWord');
+    //       if (tags && tags.length) {
+    //         const str = (tags as string[]).join(' ');
+    //         this.productForm.controls['name'].patchValue(str);
+    //         return str;
+    //       } else {
+    //         return 'zeroWord';
+    //       }
+    //     }),
+    //     startWith('zeroWord')
+    //   );
+    // } else {
+    //   this.selectedWord$ = of('zeroWord');
+    // }
+
+    this.selectedWord$ = this.namePartsInputCtrl.valueChanges.pipe(
+      startWith(this.namePartsInputCtrl.value),
+      map((tags) => {
+        return tags?.join(' ') || 'zeroWord';
+      })
+    );
+
     this.suggestions = this.selectedWord$.pipe(
       switchMap((val) => {
         const suggestions = this.suggestionsService
@@ -333,7 +403,7 @@ export class EditProductPageComponent implements AfterViewInit {
   //   });
   // }
 
-  saveProductToFirestore(product: Product) {
+  saveProductToFirestore(product: Partial<Product>) {
     // const productsCollection = collection(this.firestore,`stores/${this.storeId}/galleries/default/products` )
     // const productDocRef = doc(productsCollection);
     // const productPath = doc(productsCollection).path;
@@ -344,13 +414,6 @@ export class EditProductPageComponent implements AfterViewInit {
 
     product.storeId = this.storeId;
     product.productGalleryId = this.gallaryId;
-    if (product.thumbProperties) {
-      const { imageIds, thumbProperties } = this.toThumbPropertiesObject(
-        product.thumbProperties as unknown as SortableProductThumpsProperties[]
-      );
-      product.imageIds = imageIds;
-      product.thumbProperties = thumbProperties;
-    }
 
     if (product.customProperties) {
       if (product.customProperties['batch']) {
@@ -360,7 +423,7 @@ export class EditProductPageComponent implements AfterViewInit {
           ) || null;
       }
     }
-    product.name = product.name.trim().toLocaleLowerCase();
+    product.name = product.name?.trim().toLocaleLowerCase();
     if (product.brand) {
       product.brand = product.brand.trim().toLocaleLowerCase();
     }
@@ -368,7 +431,7 @@ export class EditProductPageComponent implements AfterViewInit {
       product.modelNos = product.modelNos.map((m) => m.trim().toLowerCase());
     }
 
-    const nameWords = product.name.split(' ') || [];
+    const nameWords = product.name?.split(' ') || [];
     product.tags = product.tags || [];
     const namePrefexes = this.getNamePrefexes(nameWords);
     product.namePrefexes = namePrefexes;
@@ -379,7 +442,7 @@ export class EditProductPageComponent implements AfterViewInit {
 
     let prom;
     if (this.addNew) {
-      prom = this.productsService.create(product);
+      prom = this.productsService.create(product as Product);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       // const {firstCreatedOn, id, ...updateProd} = {... product};
@@ -465,8 +528,12 @@ export class EditProductPageComponent implements AfterViewInit {
     }
   }
 
-  canDeactivate(){
-    if (this.formPhotoComponent && (this.formPhotoComponent.isHaveOpenModal() || this.formPhotoComponent.isHaveOpenUploadTaskModal())) {
+  canDeactivate() {
+    if (
+      this.formPhotoComponent &&
+      (this.formPhotoComponent.isHaveOpenModal() ||
+        this.formPhotoComponent.isHaveOpenUploadTaskModal())
+    ) {
       return this.formPhotoComponent.canDeactivate();
     }
     if (this.formPhotoComponent?.isBussy()) {
@@ -479,7 +546,7 @@ export class EditProductPageComponent implements AfterViewInit {
     }
     return true;
   }
-  showLeaveEditWarningSubject = new Subject<boolean>()
+  showLeaveEditWarningSubject = new Subject<boolean>();
   public alertButtons: AlertButton[] = [
     {
       text: 'Cancel',
