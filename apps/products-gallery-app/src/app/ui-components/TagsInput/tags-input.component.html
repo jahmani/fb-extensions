@@ -1,70 +1,50 @@
-<form [formGroup]="tagForm" (ngSubmit)="keyAddTag()" #form="ngForm">
-  <div [hidden]="!showInputCtrl">
+<div [hidden]="!showInputCtrl">
+  <ion-row>
 
-    <ion-row>
-      <ion-col size="auto" class="vertical-align-content">
-        <ion-label>
-          <span>
-            {{label}}:
-          </span>
-        </ion-label>
-      </ion-col>
-      <ion-col size="auto" class="ion-no-padding" *ngFor="let tag of _tags; let $index = index">
+    <ion-col size="auto" class="vertical-align-content">
+      <ion-label>
+        <span>
+          {{label}}:
+        </span>
+      </ion-label>
+    </ion-col>
 
-        <div class="iti-tags-wrap ">
+    <ion-col size="auto" class="ion-no-padding" *ngFor="let tag of _tags; let $index = index">
+      <div class="iti-tags-wrap ">
+        <ion-chip [color]="cssColor" (onClear)="btnRemoveTag($index)">
+          <ion-label>{{ tag }}</ion-label>
+          <ion-icon name="close-outline" (click)="btnRemoveTag($index)"></ion-icon>
+        </ion-chip>
+      </div>
+    </ion-col>
 
-          <ion-chip [mode]="mode" [color]="cssColor" (onClear)="btnRemoveTag($index)">
-            <ion-label>{{ tag }}</ion-label>
-            <ion-icon name="close-outline" (click)="btnRemoveTag($index)"></ion-icon>
-          </ion-chip>
+    <ion-col size="auto" class="vertical-align-content">
+      <input #tagsInput [hidden]="readonly" class="iti-input" [placeholder]="placeholder" (blur)="blur()"
+        (focus)="onInputFocus()" (keydown.backspace)="keyRemoveTag()" (keyup)="separatorStrAddTag()"
+        (keyup.enter)="keyAddTag()" list="productsTerms" (input)="onInput($event)" [formControl]="tagInputCtrl" />
+    </ion-col>
 
+  </ion-row>
+</div>
 
-        </div>
-      </ion-col>
-      <ion-col size="auto" class="vertical-align-content">
-        <input #tagsInput [hidden]="readonly" class="iti-input" [placeholder]="placeholder" (blur)="blur()"
-          (focus)="onInputFocus()" (keydown.backspace)="keyRemoveTag()" (keyup)="separatorStrAddTag()"
-          (keyup.enter)="keyAddTag()" list="productsTerms" (input)="onInput($event)" formControlName="tag" />
-      </ion-col>
+<ion-item *ngIf="showTagsBar">
 
-    </ion-row>
-  </div>
-
-</form>
-
-<ion-item>
   <span *ngIf="!showInputCtrl && label">
     {{label}}:
   </span>
-  <ion-label class="scroll-horizontal ion-no-margin" style="text-overflow: unset">
+
+  <div class="scroll-horizontal ion-no-margin" style="text-overflow: unset">
     <store-app-repository-tag-picker [tags]="filteredSuggestion" [selectedTags]='showInputCtrl ? [] : _tags'
       (tagSelected)="onSuggestionClicked($event); tagsInput.value = ''; (_isFocus && tagsInput.focus())" tabindex="0"
       (focus)="onPickerFocused()">
-
     </store-app-repository-tag-picker>
-    <!-- <ion-chip
-        (click)="onSuggestionClicked(t); tagsInput.value = ''; tagsInput.focus()"
-        *ngFor="let t of filteredSuggestion | async; let index"
-        color="tertiary"
-        mode="ios"
-        outline="true"
-      >
-        <ion-label>{{ t }}</ion-label>
-      </ion-chip> -->
+  </div>
 
-    <!-- <ion-chip
-      (click)="onSuggestionClicked(t); tagsInput.value = ''; tagsInput.focus()"
-      *ngFor="let t of filteredSuggestion | async; let index"
-      color="tertiary"
-      mode="ios"
-      outline="true"
-    >
-      <ion-label>{{ t }}</ion-label>
-    </ion-chip> -->
-  </ion-label>
   <ion-button slot="end" class="ion-no-margin" (click)="isAlertOpen = true" *ngIf="!this.showInputCtrl">
     <ion-icon slot="icon-only" name="add"></ion-icon>
   </ion-button>
 </ion-item>
-<ion-alert [isOpen]="isAlertOpen" header="Please enter tag" (didDismiss)="setResult($event)" [buttons]="alertButtons"
+
+
+<ion-alert [isOpen]="isAlertOpen" header="Please enter tag" (didDismiss)="setResult()" [buttons]="alertButtons"
   [inputs]="alertInputs"></ion-alert>

@@ -16,7 +16,8 @@ $default-color: #4a8bfc;
   border-bottom-color: $default-color;
 }
 .scroll-horizontal {
-  overflow-x: scroll !important;
+  overflow-x: scroll;
+  white-space: nowrap;
 }
 
 .iti-tag {

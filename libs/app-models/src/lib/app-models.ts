@@ -26,22 +26,22 @@ export function appModels(): string {
   return 'app-models';
 }
 
-export type PickerId =
-  | 'brands'
-  | 'colors'
-  | 'origins'
-  | 'sizes'
-  | 'units'
-  | 'tags';
-export interface PickerOptions extends Editable {
-  id: PickerId;
-  options: PickerOption[];
-}
-export interface PickerOption {
-  label: string;
-  value?: string;
-  url?: string;
-}
+// export type PickerId =
+//   | 'brands'
+//   | 'colors'
+//   | 'origins'
+//   | 'sizes'
+//   | 'units'
+//   | 'tags';
+// export interface PickerOptions extends Editable {
+//   id: PickerId;
+//   options: PickerOption[];
+// }
+// export interface PickerOption {
+//   label: string;
+//   value?: string;
+//   url?: string;
+// }
 
 export interface Editable extends WithId {
   firstCreatedOn: Timestamp;
