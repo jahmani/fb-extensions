@@ -180,7 +180,7 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     const uploadTask = uploadBytesResumable(
       storageRef,
       this.imgInfo.cropInfo?.blob || this.imgInfo.file,
-      { ...meta }
+      { ...meta, cacheControl: 'private,max-age=2592000' }
     );
     uploadTask.then(
       async (snapshot) => {
