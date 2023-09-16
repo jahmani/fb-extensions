@@ -3,7 +3,7 @@ import { Directive, ElementRef, Input, OnInit } from '@angular/core';
 @Directive({
   selector: '[storeAppRepositoryHydratedImg]',
   standalone: true,
-  exportAs:'storeAppRepositoryHydratedImg'
+  exportAs: 'storeAppRepositoryHydratedImg',
 })
 export class HydratedImgDirective implements OnInit {
   @Input({ required: true }) storeAppRepositoryHydratedImg: string | undefined;
@@ -16,10 +16,16 @@ export class HydratedImgDirective implements OnInit {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
     //Add 'implements OnInit' to the class.
     this.setFirstRenderedImage();
-    this.imgElement.onerror = (event: Event | string, source?: string, lineno?: number, colno?: number, error?: Error)=>{
+    this.imgElement.onerror = (
+      event: Event | string,
+      source?: string,
+      lineno?: number,
+      colno?: number,
+      error?: Error
+    ) => {
       console.log('img load error', error);
       console.log('img load event', event);
-    }
+    };
   }
 
   private setFirstRenderedImage() {
@@ -27,7 +33,7 @@ export class HydratedImgDirective implements OnInit {
       this.setNewRenderedImage(this.storeAppRepositoryHydratedImg);
     }
   }
-  public setNewRenderedImage(imgPath:string) {
+  public setNewRenderedImage(imgPath: string) {
     const imgElement: HTMLImageElement = this.elementRef.nativeElement;
     this.originalSrc = imgElement.src;
     if (imgPath) {
@@ -36,8 +42,11 @@ export class HydratedImgDirective implements OnInit {
       largeImage.src = imgPath;
       largeImage.onload = () => {
         imgElement.src = imgPath;
-        this.isLoading = false;
-        this.isError = false;
+        setTimeout(() => {
+          this.isLoading = false;
+          this.isError = false;
+        }, 100);
+
         // this.loadingController.dismiss();
       };
       largeImage.onerror = (ev) => {
@@ -47,5 +56,4 @@ export class HydratedImgDirective implements OnInit {
       };
     }
   }
-
 }
