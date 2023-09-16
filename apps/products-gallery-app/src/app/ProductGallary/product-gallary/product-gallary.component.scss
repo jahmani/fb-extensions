@@ -38,9 +38,9 @@ cdk-virtual-scroll-viewport {
   object-fit: cover;
 }
 .prod-preview {
-  grid-column-start: span 3;
+  grid-column: 1/-1;
   // grid-column-end: span col4-start;
-  grid-row-start: span 3;
+  grid-row-start: span var(--heightInGridRows);
   // grid-row-end: span 2;
 }
 .prod-preview-content {
@@ -67,9 +67,9 @@ cdk-virtual-scroll-viewport {
 }
 .card {
   max-width: 100%;
-  margin-inline: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-inline: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .card-content {
   font-size: 14px;
@@ -107,7 +107,7 @@ div.top-scrollbars * {
 
 .slides {
   display: flex;
-
+  height: 100%;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
 
@@ -134,10 +134,10 @@ div.top-scrollbars * {
   scroll-snap-align: start;
   flex-shrink: 0;
   width: 100%;
-  height: 300px;
+  height: 100%;
   // margin-right: 50px;
-  border-radius: 10px;
-  background: #eee;
+  border-radius: 15px;
+  background: #000000;
   transform-origin: center center;
   transform: scale(1);
   transition: transform 0.5s;
@@ -148,14 +148,14 @@ div.top-scrollbars * {
   align-items: center;
   font-size: 100px;
 }
-.slides img {
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
+// .slides img {
+//   object-fit: cover;
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+// }
 .slides > div:target {
   /*   transform: scale(0.8); */
 }

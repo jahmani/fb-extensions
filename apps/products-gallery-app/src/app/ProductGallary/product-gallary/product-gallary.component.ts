@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   Input,
   // QueryList,
@@ -28,9 +29,13 @@ import {
 import {
   InfiniteScrollCustomEvent,
   IonInfiniteScroll,
+  IonPopover,
   IonicModule,
 } from '@ionic/angular';
-import { ScrollingModule } from '@angular/cdk/scrolling';
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling';
 import { ProductsDataService } from '../../dataServices/products-data.service';
 import { TagsInputComponent } from '../../ui-components/TagsInput/tags-input.component';
 // import { WordSuggestionsDataService } from '../../dataServices/word-suggestions-data.service';
@@ -126,9 +131,15 @@ export class ProductGallaryComponent implements AfterViewInit {
 
   filterFormControl = new FormControl<AndCompositeQuery>([]);
 
+  heightInGridRows = 3;
+  isProductActionsOpen = false;
+  @ViewChild('popover') popover: IonPopover | undefined;
+  showProductInfo = true;
+  isOpen = false;
   @ViewChild(IonInfiniteScroll) infinitScroll: IonInfiniteScroll | undefined;
   storeId = inject(storeIdToken);
   private productsService = inject(ProductsDataService);
+  private cdr = inject(ChangeDetectorRef);
 
   products$: Observable<Product[]> | undefined;
 
@@ -256,5 +267,44 @@ export class ProductGallaryComponent implements AfterViewInit {
   }
   logout() {
     signOut(this.fbAuth);
+  }
+
+  showProductPreview(
+    imgContainer: HTMLElement,
+    gridContainer: HTMLElement,
+    scrollContainer: CdkVirtualScrollViewport
+  ) {
+    this.isFilterModalVisable = false;
+    setTimeout(() => imgContainer.scrollIntoView(true), 1);
+    this.cdr.detectChanges();
+
+    // Get the scroll position of the grid container
+    const scrollElement = scrollContainer.elementRef.nativeElement;
+
+    // Get the height of the grid container in pixels
+    const containerHeight = scrollElement.clientHeight;
+
+    // Get the height of a single grid row in pixels
+    const rowHeight = parseFloat(
+      window.getComputedStyle(gridContainer).getPropertyValue('grid-auto-rows')
+    );
+
+    // Calculate the height in terms of grid rows
+    const heightInGridRows = Math.floor(containerHeight / rowHeight);
+    this.heightInGridRows = heightInGridRows;
+    console.log('Height in grid rows:', heightInGridRows);
+  }
+
+  presentPopover(e: Event) {
+    if (this.popover) {
+      this.popover.event = e;
+    }
+    this.isProductActionsOpen = true;
+  }
+  copyText(product: Product) {
+    const text =
+      product.name + '\n' + product.modelNos?.length &&
+      'Model Node.' + product.modelNos.join('|');
+    navigator.clipboard.writeText(text);
   }
 }

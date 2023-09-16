@@ -35,7 +35,7 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <ion-content>
+  <ion-content [scrollY]="false">
     <ng-container *ngIf="slideView;else templateName">
 
       <ng-container *ngIf="dynamicSlidesComponent;else loadingSlidesTemplate">
@@ -52,7 +52,7 @@
     </ng-container>
     <ng-template #templateName>
 
-      <cdk-virtual-scroll-viewport itemSize="auto" class="ion-content-scroll-host">
+      <cdk-virtual-scroll-viewport #scrollContainer itemSize="auto" class="ion-content-scroll-host">
 
         <ng-template #noDocCount>
           <ion-item>
@@ -68,51 +68,76 @@
             </div>
           </ng-container>
         </div>
-        <div class="gallary_container" *ngIf=" products$|async as products ">
+        <div class="gallary_container" #gridContainer *ngIf=" products$|async as products ">
 
           <ng-container *ngFor="let  prod of ProductsInstance; trackBy: trackBy; let i=index">
-            <div class="image_container"
-              (click)="previewProduct === prod ? previewProduct= null : previewProduct = prod">
-              <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]; else noImg"
-                [src]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" priority="i<22" fill />
-              <ng-template #noImg>
-                <img style="object-fit: cover;" ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}"
-                  priority="i<22" fill />
-              </ng-template>
-            </div>
-            <div class="prod-preview" *ngIf="previewProduct === prod" routerLink=""
-              [queryParams]="{productId: prod.id}">
-              <div class="prod-preview-content">
+            <div #imgContainer [style.--heightInGridRows]="heightInGridRows" class=""
+              [class]="previewProduct === prod ? 'prod-preview' : 'image_container'">
+              <ng-container *ngIf="previewProduct === prod; else showThumb">
+                <div #title (click)="showProductInfo = !showProductInfo" class="prod-preview-content">
+                  <div class="card" style="flex: auto;">
+                    <ion-fab vertical="top" *ngIf="showProductInfo" horizontal="start" slot="fixed">
+                      <ion-fab-button class="button-transparent" (click)="previewProduct = null">
+                        <ion-icon name="chevron-collapse-outline"></ion-icon>
+                      </ion-fab-button>
+                    </ion-fab>
+                    <div class=" card-content">
+                      <div class="slides top-scrollbars">
+                        <ng-container *ngIf="prod.imageIds && prod.imageIds[0]; else noImg">
+                          <div id="slide-1" class=" image_container" *ngFor="let item of prod!.imageIds">
+                            <ion-spinner name="bubbles" class="big-spinner" *ngIf="false"></ion-spinner>
+                            <img loading="lazy" style="object-fit: contain;" #hImage="storeAppRepositoryHydratedImg"
+                              [src]="item |imgIdtoThumbUre:200"
+                              [storeAppRepositoryHydratedImg]="item |imgIdtoThumbUre:1500" alt="{{prod.name}}" fill />
+                          </div>
+                        </ng-container>
+                        <ng-template #noImg>
+                          <div id="slide-1" class=" image_container">
+                            <img ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}" fill />
+                          </div>
+                        </ng-template>
 
-                <div class="card " style="flex: auto;">
-                  <ion-fab vertical="top" horizontal="start" slot="fixed">
-                    <ion-fab-button class="button-transparent" (click)="previewProduct = null">
-                      <ion-icon name="chevron-collapse-outline"></ion-icon>
-                    </ion-fab-button>
-                  </ion-fab>
-                  <div class=" card-content">
-                    <div class="slides top-scrollbars">
-                      <ng-container *ngIf="prod.imageIds && prod.imageIds[0]; else noImg">
-                        <div id="slide-1" class=" image_container" *ngFor="let item of prod!.imageIds">
-                          <ion-spinner name="bubbles" class="big-spinner" *ngIf="hImage.isLoading"></ion-spinner>
-                          <img loading="lazy" #hImage="storeAppRepositoryHydratedImg" [src]="item |imgIdtoThumbUre:200"
-                            [storeAppRepositoryHydratedImg]="item |imgIdtoThumbUre:600" alt="{{prod.name}}" fill />
-                        </div>
-                      </ng-container>
-                      <ng-template #noImg>
-                        <div id="slide-1" class=" image_container">
-                          <img ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}" fill />
-                        </div>
-                      </ng-template>
+                      </div>
+                      <ion-item class="ion-no-margin" *ngIf="showProductInfo"
+                        style="position: absolute; bottom: 35px; right: 15px;left: 15px;">
+                        <ion-label class="ion-text-wrap">
 
+                          <ion-text style="font-size:larger; font-weight: bold;">
+                            <span>{{prod.name}}</span>
+                          </ion-text>
+                          <ion-text class="ion-float-end" color="primary">
+                            <span style="font-size: larger; font-weight: bolder;">{{prod.price}}</span>
+                          </ion-text>
+                          <ion-note class="product-note" style="display: block;">
+                            <span *ngIf="prod.modelNos && prod.modelNos.length">رقم الموديل: {{prod.modelNos}} | </span>
+                            <span *ngIf="prod.sizes">القياس: {{prod.sizes}} | </span>
+                            <span *ngIf="prod.colors">اللون: {{prod.colors}} | </span>
+                            <span *ngIf="prod.customProperties['batch']">الدفعة: {{prod.customProperties['batch']}} |
+                            </span>
+
+                          </ion-note>
+                        </ion-label>
+                        <ion-icon slot="end" (click)="presentPopover($event)"
+                          name="ellipsis-vertical-outline"></ion-icon>
+                      </ion-item>
                     </div>
-                  </div>
-                  <ion-text class="card-title">
-                    <span>{{prod.name}}</span>
-                  </ion-text>
 
+
+                  </div>
                 </div>
-              </div>
+
+              </ng-container>
+              <ng-template #showThumb>
+                <div style=" width: 100%; height: 100%;"
+                  (click)="previewProduct = prod; showProductPreview(imgContainer,gridContainer, scrollContainer)">
+                  <img style="object-fit: cover;" *ngIf="prod!.imageIds && prod!.imageIds![0]; else noImg"
+                    [src]="prod!.imageIds![0]|imgIdtoThumbUre:200" alt="{{prod.name}}" priority="i<22" fill />
+                  <ng-template #noImg>
+                    <img style="object-fit: cover;" ngSrc="../../../assets/imgs/noimg.jpg" alt="{{prod.name}}"
+                      priority="i<22" fill />
+                  </ng-template>
+                </div>
+              </ng-template>
 
             </div>
             <ng-container *ngIf="products.length < 2">
@@ -124,9 +149,6 @@
               </div>
             </ng-container>
           </ng-container>
-
-
-
 
         </div>
         <ion-infinite-scroll threshold="0" (ionInfinite)="onInfinitScroll($event)">
@@ -182,3 +204,26 @@
   </ion-footer>
 
 </ng-container>
+<ion-popover #popover [isOpen]="isProductActionsOpen" side="top" alignment="start" [dismissOnSelect]="true"
+  (didDismiss)="isProductActionsOpen = false">
+  <ng-template>
+    <ion-content class="ion-padding" *ngIf="previewProduct">
+      <ion-item [button]="true" [detail]="false" (click)="$event.stopPropagation(); previewProduct = null">collaps
+        <ion-icon slot="start" name="chevron-collapse-outline"></ion-icon>
+      </ion-item>
+
+      <ion-item [button]="true" [detail]="false" routerLink="" [queryParams]="{productId: previewProduct?.id}">expand
+        <ion-icon slot="start" name="chevron-expand-outline"></ion-icon>
+      </ion-item>
+
+      <ion-item [button]="true" [detail]="false" [routerLink]="['../edit-product', previewProduct?.id]">edit
+        <ion-icon slot="start" name="create"></ion-icon>
+      </ion-item>
+
+      <ion-item [button]="true" [detail]="false" (click)="copyText(previewProduct)">copy
+        <ion-icon slot="start" name="copy-outline"></ion-icon>
+      </ion-item>
+
+    </ion-content>
+  </ng-template>
+</ion-popover>
