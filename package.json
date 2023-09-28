@@ -25,6 +25,7 @@
     "@nx/angular": "16.7.4",
     "@simondotm/nx-firebase": "^1.1.0-beta.0",
     "axios": "^1.0.0",
+    "browser-image-compression": "^2.0.2",
     "firebase": "^9.14.0",
     "firebase-admin": "^11.8.0",
     "firebase-functions": "^4.4.0",
@@ -84,4 +85,3 @@
     "typescript": "5.1.6"
   }
 }
-
