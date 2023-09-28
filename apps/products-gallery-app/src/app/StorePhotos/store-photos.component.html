@@ -1,0 +1,61 @@
+<ion-content>
+    <div class="gallary_container" *ngIf=" photosDocs$|async as photosDocs ">
+        <!-- <ion-button (click)="updateAll(photosDocs)" expand="block" fill="clear" shape="round">
+            updateAll
+        </ion-button> -->
+        <ng-container *ngFor="let   photosDoc of photosDocs; let i=index">
+            <div class="image_container">
+                <img style="object-fit: cover;" [src]=" photosDoc!.id|imgIdtoThumbUre:200" alt="{{ photosDoc.id}}"
+                    priority="i<22" fill />
+                <ion-badge style=" position: absolute; z-index: 10; bottom: 0px; right: 0px;" color="primary"
+                    mode="ios">{{photosDoc.refCount}}</ion-badge>
+            </div>
+            <div class=" photosDoc-preview" *ngIf="previewProduct ===  photosDoc">
+                <div class=" photosDoc-preview-content">
+
+                    <div class="card " style="flex: auto;">
+                        <ion-fab vertical="top" horizontal="start" slot="fixed">
+                            <ion-fab-button class="button-transparent" (click)="previewProduct = undefined">
+                                <ion-icon name="chevron-collapse-outline"></ion-icon>
+                            </ion-fab-button>
+                        </ion-fab>
+                        <div class=" card-content">
+                            <div class="slides top-scrollbars">
+                                <ng-container *ngIf=" photosDoc.id ; else noImg">
+                                    <div id="slide-1" class=" image_container">
+                                        <ion-spinner name="bubbles" class="big-spinner"
+                                            *ngIf="hImage.isLoading"></ion-spinner>
+                                        <img loading="lazy" #hImage="storeAppRepositoryHydratedImg"
+                                            [src]="photosDoc.id |imgIdtoThumbUre:200"
+                                            [storeAppRepositoryHydratedImg]="photosDoc.id |imgIdtoThumbUre:600"
+                                            alt="{{ photosDoc.id}}" fill />
+                                    </div>
+                                </ng-container>
+                                <ng-template #noImg>
+                                    <div id="slide-1" class=" image_container">
+                                        <img ngSrc="../../../assets/imgs/noimg.jpg" alt="{{ photosDoc.id }}" fill />
+                                    </div>
+                                </ng-template>
+
+                            </div>
+                        </div>
+                        <ion-text class="card-title">
+                            <span>{{photosDoc.id}}</span>
+                        </ion-text>
+
+                    </div>
+                </div>
+
+            </div>
+            <ng-container *ngIf=" photosDocs.length < 2">
+                <div class="image_container placeholder">
+                </div>
+            </ng-container>
+            <ng-container *ngIf=" photosDocs.length < 3">
+                <div class="image_container placeholder">
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+
+</ion-content>

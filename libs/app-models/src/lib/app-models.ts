@@ -179,7 +179,7 @@ export interface ProductGallery extends Editable, StoreDoc {
   users: ProductGalleryUser[];
 }
 
-export interface ProductPhoto extends Editable, StoreDoc {
+export interface ProductPhoto extends WithId, Editable, StoreDoc {
   contentType: string;
   downloadUrl: string;
   metadata: {
