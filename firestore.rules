@@ -28,6 +28,12 @@ allow write: if true;
         allow write: if  false; // Disabling write operations. Update this according to your needs.
       }
 
+      //
+      match /storePhotos/{storePhotoId}{
+        allow read: if getStoreUser();
+        allow delete: if  request.resource.data.refCount == 0;
+      }
+
       // Rules for galleries collection and its subcollections
       match /galleries/{galleryId} {
 
@@ -44,29 +50,29 @@ allow write: if true;
                           request.resource.data.keys().hasOnly(['role']) && 
                           request.resource.data.role in ['manager', 'readonly', 'editor'];
         }
-match /queries/{queryId} {
-  allow read, write: if true;
-}
-match /products/{productId} {
-  function isProductDataValid(isCreate) {
-  return request.resource.data.id == productId &&
-    request.resource.data.storeId == storeId &&
-    request.resource.data.productGalleryId == galleryId &&
-    request.resource.data.lastEditedOn == request.time &&
-    request.resource.data.lastEditedByUserId == request.auth.uid &&
-    request.resource.data.name != null &&  request.resource.data.name is string  &&  request.resource.data.name.trim().size() > 0 && 
-    request.resource.data.keys().hasOnly(['id', 'storeId', 'productGalleryId', 'firstCreatedOn', 
-    'lastEditedOn', 'lastEditedByUserId', 'name',
-     'namePrefexes', 'modelNos', 'price', 'brand', 'costPrice', 'note', 'sizes', 'colors', 'origin',
-      'imageIds', 'thumbProperties', 'tags',
-      'balance', 'variants', 'customProperties']) &&
-    (isCreate ? request.resource.data.firstCreatedOn == request.time : resource.data.firstCreatedOn == request.resource.data.firstCreatedOn);
-}
-  allow read: if getUserRole(storeId, galleryId) !=null;
-  allow create: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) && isProductDataValid(true);  
-  allow update: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) && isProductDataValid(false);
-  allow delete: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) ;
-}
+        match /queries/{queryId} {
+          allow read, write: if true;
+        }
+        match /products/{productId} {
+          function isProductDataValid(isCreate) {
+          return request.resource.data.id == productId &&
+            request.resource.data.storeId == storeId &&
+            request.resource.data.productGalleryId == galleryId &&
+            request.resource.data.lastEditedOn == request.time &&
+            request.resource.data.lastEditedByUserId == request.auth.uid &&
+            request.resource.data.name != null &&  request.resource.data.name is string  &&  request.resource.data.name.trim().size() > 0 && 
+            request.resource.data.keys().hasOnly(['id', 'storeId', 'productGalleryId', 'firstCreatedOn', 
+            'lastEditedOn', 'lastEditedByUserId', 'name',
+            'namePrefexes', 'modelNos', 'price', 'brand', 'costPrice', 'note', 'sizes', 'colors', 'origin',
+              'imageIds', 'thumbProperties', 'tags',
+              'balance', 'variants', 'customProperties']) &&
+            (isCreate ? request.resource.data.firstCreatedOn == request.time : resource.data.firstCreatedOn == request.resource.data.firstCreatedOn);
+        }
+          allow read: if getUserRole(storeId, galleryId) !=null;
+          allow create: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) && isProductDataValid(true);  
+          allow update: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) && isProductDataValid(false);
+          allow delete: if isOneOfRoles(storeId, galleryId, ['owner', 'manager', 'editor']) ;
+        }
 
 
 

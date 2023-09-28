@@ -31,6 +31,10 @@
       <ion-input label="Price" type="number" formControlName="price"></ion-input>
     </ion-item>
 
+    <ion-item>
+      <ion-input label="Size" formControlName="sizes"></ion-input>
+    </ion-item>
+
     <store-app-repository-tags-input [showTagsBar]="false" formControlName="modelNos" [maxTags]="10"
       label="ModelNo"></store-app-repository-tags-input>
 
@@ -53,9 +57,6 @@
       <ion-input label="Model No" formControlName="modelNo"></ion-input>
     </ion-item> -->
 
-    <ion-item>
-      <ion-input label="Size" formControlName="sizes"></ion-input>
-    </ion-item>
 
     <ion-item>
       <ion-input label="Color" formControlName="colors"></ion-input>
@@ -91,13 +92,21 @@
     <ion-item>
       <ion-input label="Origin" formControlName="origin"></ion-input>
     </ion-item>
-    <ion-button type="submit">Save</ion-button>
-    <ion-button *ngIf="!addNew"
-      (click)="productForm.value.id && deleteProduct(productForm.value.id)">delete</ion-button>
+
 
   </form>
 
 </ion-content>
+<ion-footer>
+  <ion-row>
+    <ion-col> <ion-button type="submit" expand="block"
+        (click)="saveProductToFirestore(productForm.value)">Save</ion-button></ion-col>
+    <ion-col size="3"> <ion-button *ngIf="!addNew" expand="block"
+        (click)="productForm.value.id && deleteProduct(productForm.value.id)">delete</ion-button></ion-col>
+  </ion-row>
+
+
+</ion-footer>
 
 <ion-alert [isOpen]="showLeaveEditWarning" header="الخروج قبل حفظ التغييرات؟!" [buttons]="alertButtons"
   (didDismiss)="showLeaveEditWarning = false"></ion-alert>
