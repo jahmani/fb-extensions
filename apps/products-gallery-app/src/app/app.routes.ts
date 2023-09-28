@@ -20,6 +20,8 @@ export const appRoutes: Route[] = [
     loadChildren: () =>
       import('./folder/folder.module').then((m) => m.FolderPageModule),
   },
+
+  { path: 'share/image', redirectTo: 'store/tHP7s3ysRD4IU45Z0j8N/products' },
   {
     path: 'store/:id',
     providers: [

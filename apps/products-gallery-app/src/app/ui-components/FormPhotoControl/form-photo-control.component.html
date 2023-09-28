@@ -117,7 +117,8 @@
               <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
                 <ion-item *ngFor="let imgD of value, let index = index">
                   <ion-thumbnail class="big-thumb">
-                    <img sclass="ion-margin-vertical" [src]="imgD.imageId|imgIdtoThumbUre:600" />
+                    <img sclass="ion-margin-vertical" [src]="imgD.imageId|imgIdtoThumbUre:200"
+                      [storeAppRepositoryHydratedImg]="imgD.imageId|imgIdtoThumbUre:600" />
                   </ion-thumbnail>
 
                   <ion-label>
@@ -145,7 +146,8 @@
                   </ion-fab>
                   <img class="ion-margin-vertical" style="width: 100%;"
                     [style.aspect-ratio]="imgId.metas[0].height/imgId.metas[0].width"
-                    [src]="imgId.imageId|imgIdtoThumbUre:600" />
+                    [src]="imgId.imageId|imgIdtoThumbUre:200"
+                    [storeAppRepositoryHydratedImg]="imgId.imageId|imgIdtoThumbUre:600" />
                 </div>
               </div>
             </div>

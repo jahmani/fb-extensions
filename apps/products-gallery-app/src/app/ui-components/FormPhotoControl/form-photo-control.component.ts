@@ -19,8 +19,8 @@ import {
 } from '@ionic/angular';
 import {
   FileInfo,
-  ImageMeta,
-  ProductThumpsProperties,
+  // ImageMeta,
+  // ProductThumpsProperties,
   SortableProductThumpsProperties,
   getExtendedFileData,
 } from '@store-app-repository/app-models';
@@ -31,6 +31,7 @@ import { CommonModule } from '@angular/common';
 import { FileIdGetterToken } from '../../ProductGallary/edit-product/edit-product.page';
 import { ImgIdtoThumbUrePipe } from '../img-idto-thumb-ure.pipe';
 import { ThumbObjToImgIdsPipe } from '../thumb-obj-to-img-ids.pipe';
+import { HydratedImgDirective } from '../hydrated-img.directive';
 
 const defaultFileIdGetter = (fileInfo: FileInfo) => {
   const id = `/${Date.now()}_${fileInfo.name}`;
@@ -46,6 +47,7 @@ const defaultFileIdGetter = (fileInfo: FileInfo) => {
     UploadTaskComponent,
     ImgIdtoThumbUrePipe,
     ThumbObjToImgIdsPipe,
+    HydratedImgDirective,
   ],
   templateUrl: './form-photo-control.component.html',
   styleUrls: ['./form-photo-control.component.scss'],
@@ -98,8 +100,8 @@ export class FormPhotoControlComponent
     this.fileIdGetter = inject(FileIdGetterToken, { optional: true });
   }
   ngAfterViewInit(): void {
-    this.sharedFilesService.sharedMediaP.then((sf) => {
-      this.sharedFilesInfo = this.extendAllSharedFiles(sf);
+    this.sharedFilesService.sharedMediaP.then(async (sf) => {
+      this.sharedFilesInfo = await this.extendAllSharedFiles(sf);
     });
   }
 
@@ -115,23 +117,18 @@ export class FormPhotoControlComponent
     this._value = obj;
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (() => unknown) | undefined): void {
     console.log('registerOnChange');
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: (() => unknown) | undefined): void {
     this.onTouched = fn;
   }
 
   setDisabledState(isDisabled: boolean): void {
     console.log('isDisabled : ', isDisabled);
   }
-
-  // onThumbsPropertiesChanged(imgInfo: FileInfo, thumbsMeta: ImageMeta[]) {
-  //   const temp: ProductThumpsProperties = {};
-  //   temp[imgInfo.docId] = thumbsMeta;
-  // }
 
   onDownloadUrlChangeFromThumb(
     resFile: FileInfo,
@@ -142,6 +139,7 @@ export class FormPhotoControlComponent
       this.onFileUploadCompleted(resFile, file, files);
     }
   }
+
   onFileUploadCompleted(resFile: FileInfo, file: FileInfo, files: FileInfo[]) {
     const i = files.indexOf(file);
     if (i === -1) {
@@ -182,10 +180,17 @@ export class FormPhotoControlComponent
   }
 
   extendAllSharedFiles(sharedFiles: { file: File; imgUrl: string }[]) {
-    return sharedFiles.map((file) => {
+    const res = sharedFiles.map(async (file) => {
       const sharedFileInfo = getExtendedFileData(file.file);
+      if (this.fileIdGetter) {
+        sharedFileInfo.docId = await this.fileIdGetter(sharedFileInfo);
+      } else {
+        sharedFileInfo.docId = defaultFileIdGetter(sharedFileInfo);
+      }
+
       return sharedFileInfo;
     });
+    return Promise.all(res);
   }
 
   async onFileSelected($event: Event) {

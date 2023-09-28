@@ -80,9 +80,9 @@ bootstrapApplication(AppComponent, {
         return stoarge;
       })
     ),
-    provideServiceWorker('ngsw-worker.js', {
+    provideServiceWorker('firebase-messaging-sw.js', {
       enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000',
+      registrationStrategy: 'registerWhenStable:4',
     }),
   ],
 }).catch((err) => console.error(err));
