@@ -1,12 +1,8 @@
 <ng-container *ngIf=" products$|async as products">
-
-
-
   <ion-header>
     <ion-toolbar>
-
       <ion-title>
-        products
+        productss
       </ion-title>
       <ion-buttons slot="start">
         <ng-container *ngIf="slideView;else showNewButton">
@@ -19,19 +15,16 @@
             </ion-thumbnail>
           </ng-container>
         </ng-template>
-
       </ion-buttons>
       <ion-buttons slot="end">
         <ion-button [routerLink]="['../edit-product', 'new']" routerLinkActive="router-link-active">
           <ion-icon slot="start" name="create"></ion-icon>
           <span>جديد</span>
         </ion-button>
-
         <ion-button (click)="logout()">
           <ion-icon slot="start" name="log-out-outline"></ion-icon>
           <span>خروج</span>
         </ion-button>
-
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -112,7 +105,8 @@
                             <span *ngIf="prod.modelNos && prod.modelNos.length">رقم الموديل: {{prod.modelNos}} | </span>
                             <span *ngIf="prod.sizes">القياس: {{prod.sizes}} | </span>
                             <span *ngIf="prod.colors">اللون: {{prod.colors}} | </span>
-                            <span *ngIf="prod.customProperties['batch']">الدفعة: {{prod.customProperties['batch']}} |
+                            <span *ngIf="!hideBatch && prod.customProperties['batch']">الدفعة:
+                              {{prod.customProperties['batch']}} |
                             </span>
 
                           </ion-note>
@@ -212,16 +206,21 @@
         <ion-icon slot="start" name="chevron-collapse-outline"></ion-icon>
       </ion-item>
 
-      <ion-item [button]="true" [detail]="false" routerLink="" [queryParams]="{productId: previewProduct?.id}">expand
+      <ion-item [button]="true" [detail]="false" routerLink="" [queryParams]="{productId: previewProduct.id}">expand
         <ion-icon slot="start" name="chevron-expand-outline"></ion-icon>
       </ion-item>
 
-      <ion-item [button]="true" [detail]="false" [routerLink]="['../edit-product', previewProduct?.id]">edit
+      <ion-item [button]="true" [detail]="false" [routerLink]="['../edit-product', previewProduct.id]">edit
         <ion-icon slot="start" name="create"></ion-icon>
       </ion-item>
 
       <ion-item [button]="true" [detail]="false" (click)="copyText(previewProduct)">copy
         <ion-icon slot="start" name="copy-outline"></ion-icon>
+      </ion-item>
+
+      <ion-item [button]="true" [detail]="false" (click)="hideBatch = ! hideBatch">
+        {{hideBatch ? 'show Batch' : 'hide batch' }}
+        <ion-icon slot="start" [name]="hideBatch ? 'eye-outline' : 'eye-off-outline' "></ion-icon>
       </ion-item>
 
     </ion-content>

@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  OnInit,
   ChangeDetectorRef,
   Component,
   Input,
@@ -83,7 +84,23 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './product-gallary.component.html',
   styleUrls: ['./product-gallary.component.scss'],
 })
-export class ProductGallaryComponent implements AfterViewInit {
+export class ProductGallaryComponent implements AfterViewInit, OnInit {
+  private _hideBatch: boolean | undefined;
+  public get hideBatch() {
+    if (this._hideBatch === undefined) {
+      const lsvalue = localStorage.getItem('hideBatch');
+      if (lsvalue) {
+        this._hideBatch = JSON.parse(lsvalue);
+      } else {
+        this._hideBatch = false;
+      }
+    }
+    return this._hideBatch;
+  }
+  public set hideBatch(value) {
+    this._hideBatch = value;
+    localStorage.setItem('hideBatch', JSON.stringify(value));
+  }
   slideView = true;
   intialSlideIndex = 0;
   ProductsInstance: Product[] = [];
@@ -163,6 +180,7 @@ export class ProductGallaryComponent implements AfterViewInit {
       this.isFilterModalVisable = false;
     });
   }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     if (this.infinitScroll) {
@@ -296,15 +314,24 @@ export class ProductGallaryComponent implements AfterViewInit {
   }
 
   presentPopover(e: Event) {
+    e.stopPropagation();
     if (this.popover) {
       this.popover.event = e;
     }
     this.isProductActionsOpen = true;
   }
   copyText(product: Product) {
-    const text =
-      product.name + '\n' + product.modelNos?.length &&
-      'Model Node.' + product.modelNos.join('|');
+    let text = '*' + product.name + '*';
+    if (product.price) {
+      text += '\nالسعر:' + product.price;
+    }
+    if (product.sizes) {
+      text += '\nالقياس:' + product.sizes;
+    }
+    if (product.modelNos?.length) {
+      text += '\nموديل:' + product.modelNos.join('|');
+    }
+
     navigator.clipboard.writeText(text);
   }
 }
